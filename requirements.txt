@@ -1,0 +1,7 @@
+python==3.12
+ipykernel
+matplotlib
+pandas
+seaborn
+numpy
+pyarrow
