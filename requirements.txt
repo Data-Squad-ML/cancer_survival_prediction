@@ -3,5 +3,4 @@ ipykernel
 matplotlib
 pandas
 seaborn
-numpy
 pyarrow
