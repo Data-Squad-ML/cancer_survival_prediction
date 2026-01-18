@@ -207,4 +207,4 @@ marimo/_lsp/
 __marimo__/
 
 # dataset
-data/
+data/raw_inca_registro_hospitalar.parquet
