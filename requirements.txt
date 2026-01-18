@@ -1,6 +1,6 @@
 python==3.12
-ipykernel
-matplotlib
-pandas
-seaborn
-pyarrow
+ipykernel==6.31.0
+matplotlib==3.10.8
+pandas==2.3.3
+seaborn==0.13.2
+pyarrow==22.0.0
