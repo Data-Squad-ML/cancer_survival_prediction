@@ -1,0 +1,53 @@
+======================================================================
+XGBOOST - RESULTADOS
+======================================================================
+Data/hora: 2026-04-12T19:15:12
+Coluna alvo: status_vital
+Modo de execucao: GPU
+Amostras de treino: 58767
+Amostras de teste: 14692
+
+--- Grid Search ---
+Melhor score de CV (f1_weighted): 1.000000
+Melhores hiperparametros: {'model__colsample_bytree': 0.8, 'model__gamma': 0.0, 'model__learning_rate': 0.03, 'model__max_depth': 4, 'model__min_child_weight': 1, 'model__n_estimators': 200, 'model__subsample': 0.8}
+
+--- Avaliacao no conjunto de teste ---
+Accuracy: 1.000000
+F1 weighted: 1.000000
+
+Matriz de confusao:
+[[ 1832     0]
+ [    0 12860]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+           0     1.0000    1.0000    1.0000      1832
+           1     1.0000    1.0000    1.0000     12860
+
+    accuracy                         1.0000     14692
+   macro avg     1.0000    1.0000    1.0000     14692
+weighted avg     1.0000    1.0000    1.0000     14692
+
+
+--- Feature Importance (Top 20) ---
+class_weight                       0.667089
+tempo_ate_obito                    0.165135
+tempo_total_doenca                 0.068567
+cat_localizacao_primaria_te        0.024389
+m_tnm                              0.014044
+razao_nao_tratamento_hospital_8    0.008408
+uf_hospital_regiao_Sul             0.006094
+uf_procedencia_regiao_Sudeste      0.005818
+uf_procedencia_regiao_Sul          0.005644
+tipo_histologico_tumor_te          0.005386
+m_ptnm                             0.004971
+t_tnm                              0.004813
+razao_nao_tratamento_hospital_6    0.004627
+t_ptnm                             0.002834
+mais_de_um_tumor_primario          0.002381
+tempo_ate_tratamento               0.002259
+tempo_ate_consulta                 0.002112
+comportamento_histologico_tumor    0.001511
+uf_hospital_regiao_Sudeste         0.001152
+razao_nao_tratamento_hospital_4    0.001141
