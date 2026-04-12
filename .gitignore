@@ -208,3 +208,4 @@ __marimo__/
 
 # dataset
 data/raw_inca_registro_hospitalar.parquet
+gpu_ic.txt
