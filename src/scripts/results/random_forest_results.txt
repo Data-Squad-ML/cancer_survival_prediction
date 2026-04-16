@@ -1,0 +1,43 @@
+======================================================================
+RANDOM FOREST - RESULTADOS
+======================================================================
+Data/hora: 2026-04-12T21:42:29
+Coluna alvo: status_vital
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 84
+Uso de class_weight como sample_weight: sim
+Metrica de Grid/CV: roc_auc
+
+--- Grid Search com KFold ---
+Melhor score de CV: 0.878765
+Desvio padrao do melhor score: 0.001182
+Melhores hiperparametros: {'model__max_depth': None, 'model__max_features': 'log2', 'model__min_samples_leaf': 1, 'model__min_samples_split': 5, 'model__n_estimators': 400}
+
+--- Avaliacao AUC ---
+AUC treino: 0.999848
+AUC teste : 0.883600
+Gap       : 0.116247
+
+--- Top 20 Permutation Importance (teste) ---
+                        feature  importance_mean  importance_std
+    cat_localizacao_primaria_te         0.021427        0.001326
+                          m_tnm         0.015166        0.001215
+razao_nao_tratamento_hospital_6         0.010586        0.000505
+                          idade         0.008572        0.001011
+                         t_ptnm         0.006962        0.001054
+      tipo_histologico_tumor_te         0.006641        0.001261
+                      tipo_caso         0.005853        0.000391
+                         m_ptnm         0.005831        0.000565
+                          t_tnm         0.005049        0.000863
+                         n_ptnm         0.004722        0.000669
+           tempo_ate_tratamento         0.004401        0.001053
+      mais_de_um_tumor_primario         0.003463        0.000586
+                          n_tnm         0.002480        0.000593
+             tempo_ate_consulta         0.002046        0.000566
+ primeiro_tratamento_hospital_4         0.001950        0.000315
+ primeiro_tratamento_hospital_2         0.001935        0.000360
+razao_nao_tratamento_hospital_8         0.001821        0.000273
+ subcat_localizacao_primaria_te         0.001747        0.000270
+      uf_procedencia_regiao_Sul         0.001736        0.000506
+                   escolaridade         0.001598        0.000429

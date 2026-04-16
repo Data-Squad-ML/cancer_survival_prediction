@@ -143,6 +143,17 @@ def param_grid():
         yield dict(zip(keys, combo))
 
 
+def sanitize_cuml_params(params: dict) -> dict:
+    sanitized = dict(params)
+
+    # cuML nao aceita max_depth=None como no scikit-learn.
+    # Usamos um valor alto para manter comportamento proximo de "sem limite".
+    if sanitized.get("max_depth") is None:
+        sanitized["max_depth"] = 64
+
+    return sanitized
+
+
 def _fit_gpu_rf(
     x_train_df: pd.DataFrame,
     y_train_sr: pd.Series,
@@ -150,6 +161,8 @@ def _fit_gpu_rf(
     random_state: int,
     sample_weight: pd.Series | None,
 ):
+    params = sanitize_cuml_params(params)
+
     model = RandomForestClassifier(
         random_state=random_state,
         n_streams=1,
