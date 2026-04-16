@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/train_random_survival_forest.py", line 22, in <module>
+    from sksurv.ensemble import RandomSurvivalForest
+ModuleNotFoundError: No module named 'sksurv'
+Fitting 5 folds for each of 432 candidates, totalling 2160 fits
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/train_random_survival_forest.py", line 335, in <module>
+    main()
+  File "/home/f-ec2021/ra234618/train_random_survival_forest.py", line 291, in main
+    grid_search = run_training(
+                  ^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/train_random_survival_forest.py", line 193, in run_training
+    grid_search.fit(x_train, y_train)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sklearn/base.py", line 1336, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sklearn/model_selection/_search.py", line 1053, in fit
+    self._run_search(evaluate_candidates)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sklearn/model_selection/_search.py", line 1612, in _run_search
+    evaluate_candidates(ParameterGrid(self.param_grid))
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sklearn/model_selection/_search.py", line 999, in evaluate_candidates
+    out = parallel(
+          ^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sklearn/utils/parallel.py", line 91, in __call__
+    return super().__call__(iterable_with_config_and_warning_filters)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 2072, in __call__
+    return output if self.return_generator else list(output)
+                                                ^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 1682, in _get_outputs
+    yield from self._retrieve()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 1784, in _retrieve
+    self._raise_error_fast()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 1859, in _raise_error_fast
+    error_job.get_result(self.timeout)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 758, in get_result
+    return self._return_or_raise()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/parallel.py", line 773, in _return_or_raise
+    raise self._result
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker.
+
+The exit codes of the workers are {SIGKILL(-9)}
+Detailed tracebacks of the workers should have been printed to stderr in the executor process if faulthandler was not disabled.
+/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/joblib/externals/loky/backend/resource_tracker.py:359: UserWarning: resource_tracker: There appear to be 80 leaked semlock objects to clean up at shutdown
+  warnings.warn(
