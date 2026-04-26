@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Treina LightGBM Survival (Cox) com Grid Search, KFold, GPU automatica e metricas avancadas."""
+"""Treina LightGBM Survival (Cox) com objetivo survival, Grid Search e metricas avancadas."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def default_data_path(filename: str) -> Path:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Treino de LightGBM Survival (objective=cox) com Grid Search, "
+            "Treino de LightGBM Survival (objective survival) com Grid Search, "
             "KFold, C-index, AUC dinamica, Brier score, IBS e importancias."
         )
     )
@@ -89,7 +89,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("results/lightgbm_survival_gpu_results.txt"),
     )
     parser.add_argument("--cv", type=int, default=5)
-    parser.add_argument("--n-jobs", type=int, default=-1)
+    parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--lgbm-n-jobs", type=int, default=1)
     parser.add_argument("--perm-repeats", type=int, default=10)
     parser.add_argument("--random-state", type=int, default=42)
@@ -132,7 +132,7 @@ def build_survival_targets(
     event_time_col: str,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     event = (df[target].astype(int) == 0).to_numpy(dtype=bool)
-    time = np.where(event, df[event_time_col].to_numpy(), df[time_col].to_numpy()).astype(float)
+    time = np.where(event, df[event_time_col].to_numpy(), df[time_col].to_numpy()).astype(np.float32)
     y_surv = Surv.from_arrays(event=event, time=time)
     return y_surv, event, time
 
@@ -141,6 +141,50 @@ def build_survival_label_cox(time: np.ndarray, event: np.ndarray) -> np.ndarray:
     label = time.copy()
     label[~event] *= -1.0
     return label
+
+
+def decode_survival_label_cox(y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Decodifica label Cox: tempo positivo (evento) e negativo (censura)."""
+    y = np.asarray(y, dtype=float)
+    event = y > 0.0
+    time = np.abs(y)
+    return time, event
+
+
+def cox_objective_lgbm(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Objetivo Cox (neg log partial-likelihood) para LightGBM.
+
+    A implementacao usa labels assinados:
+    - tempo > 0: evento observado
+    - tempo < 0: censurado
+    """
+    time, event = decode_survival_label_cox(y_true)
+
+    # Ordenacao ascendente por tempo para montar somas de risco (sufixo)
+    order = np.argsort(time, kind="mergesort")
+    event_sorted = event[order].astype(np.float32)
+    pred_sorted = np.asarray(y_pred, dtype=float)[order]
+
+    # Evita overflow de exp() em iteracoes profundas do boosting
+    pred_sorted = np.clip(pred_sorted, -50.0, 50.0)
+    exp_pred = np.exp(pred_sorted)
+
+    risk_set_sum = np.cumsum(exp_pred[::-1])[::-1]
+    risk_set_sum = np.maximum(risk_set_sum, 1e-12)
+    inv_risk = 1.0 / risk_set_sum
+
+    prefix_a = np.cumsum(event_sorted * inv_risk)
+    prefix_b = np.cumsum(event_sorted * (inv_risk**2))
+
+    grad_sorted = -event_sorted + exp_pred * prefix_a
+    hess_sorted = exp_pred * prefix_a - (exp_pred**2) * prefix_b
+    hess_sorted = np.maximum(hess_sorted, 1e-12)
+
+    grad = np.empty_like(grad_sorted)
+    hess = np.empty_like(hess_sorted)
+    grad[order] = grad_sorted
+    hess[order] = hess_sorted
+    return grad, hess
 
 
 def load_split_data(
@@ -162,13 +206,13 @@ def load_split_data(
     test_df = test_df.dropna(subset=[target, time_col]).copy()
 
     feature_cols = build_feature_columns(train_df, test_df)
-    x_train = train_df[feature_cols].astype(float)
-    x_test = test_df[feature_cols].astype(float)
+    x_train = train_df[feature_cols].astype(np.float32)
+    x_test = test_df[feature_cols].astype(np.float32)
 
     y_train_surv, _, _ = build_survival_targets(train_df, target, time_col, event_time_col)
     y_test_surv, _, _ = build_survival_targets(test_df, target, time_col, event_time_col)
 
-    w_train = train_df["class_weight"].astype(float) if "class_weight" in train_df.columns else None
+    w_train = train_df["class_weight"].astype(np.float32) if "class_weight" in train_df.columns else None
 
     return (
         x_train,
@@ -182,15 +226,18 @@ def load_split_data(
 
 def make_lgbm_model(random_state: int, lgbm_n_jobs: int, mode: str) -> LGBMRegressor:
     params = {
-        "objective": "cox",
-        "metric": "cox",
+        "objective": "survival:cox",
+        "metric": "None",
         "random_state": random_state,
         "verbose": -1,
         "n_jobs": lgbm_n_jobs,
     }
 
     if mode == "gpu":
-        params.update({"device_type": "gpu"})
+        params.update({"device_type": "gpu",    
+                       "gpu_platform_id": 3,
+                       "gpu_device_id": 3,
+                       "max_bin": 255})
     else:
         params.update({"device_type": "cpu"})
 
@@ -257,7 +304,7 @@ class LGBMSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y, sample_weight=None):
         event = np.asarray(y["event"]).astype(bool)
-        time = np.asarray(y["time"]).astype(float)
+        time = np.asarray(y["time"]).astype(np.float32)
         y_lgbm = build_survival_label_cox(time=time, event=event)
         self.model_ = self._make_model()
         fit_kwargs = {"sample_weight": sample_weight} if sample_weight is not None else {}
@@ -284,7 +331,7 @@ def select_lgbm_mode(
         return "cpu"
 
     event = np.asarray(y_train_surv["event"]).astype(bool)
-    time = np.asarray(y_train_surv["time"]).astype(float)
+    time = np.asarray(y_train_surv["time"]).astype(np.float32)
     y_train_lgbm = build_survival_label_cox(time=time, event=event)
 
     sample_size = min(2048, len(x_train))
@@ -414,15 +461,15 @@ def build_eval_times(
     min_eval_times: int,
     max_eval_times: int,
 ) -> np.ndarray:
-    train_times = y_train_surv["time"].astype(float)
-    test_times = y_test_surv["time"].astype(float)
+    train_times = y_train_surv["time"].astype(np.float32)
+    test_times = y_test_surv["time"].astype(np.float32)
     lower = max(float(np.min(train_times)), float(np.min(test_times)))
     upper = min(float(np.max(train_times)), float(np.max(test_times)))
 
     if upper <= lower:
         raise ValueError("Nao foi possivel determinar intervalo de tempos para metricas dinamicas.")
 
-    test_event_times = y_test_surv["time"][y_test_surv["event"]].astype(float)
+    test_event_times = y_test_surv["time"][y_test_surv["event"]].astype(np.float32)
     candidate = test_event_times[(test_event_times > lower) & (test_event_times < upper)]
     unique_candidate = np.unique(candidate)
 
@@ -434,7 +481,7 @@ def build_eval_times(
         eps = max((upper - lower) * 1e-3, 1e-6)
         eval_times = np.linspace(lower + eps, upper - eps, num=max(min_eval_times, 5))
 
-    eval_times = np.unique(eval_times.astype(float))
+    eval_times = np.unique(eval_times.astype(np.float32))
     eval_times = eval_times[(eval_times > lower) & (eval_times < upper)]
 
     if len(eval_times) < 3:
@@ -592,7 +639,7 @@ def compute_and_save_global_shap(
     shap.summary_plot(
         shap_values,
         features=x_imputed_df,
-        feature_names=list(x_test.columns),
+        #feature_names=list(x_test.columns),
         plot_type="bar",
         show=False,
     )
