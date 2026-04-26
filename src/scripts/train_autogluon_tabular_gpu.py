@@ -119,9 +119,9 @@ def load_split_data(train_path: Path, test_path: Path, target: str):
 
     feature_cols = build_feature_columns(train_df, test_df)
 
-    x_train = train_df[feature_cols].astype(float)
+    x_train = train_df[feature_cols].copy() #deixando o autogluon inferir os tipos
     y_train = train_df[target].astype(int)
-    x_test = test_df[feature_cols].astype(float)
+    x_test = test_df[feature_cols].copy()
     y_test = test_df[target].astype(int)
 
     if y_train.nunique() < 2:
@@ -217,11 +217,18 @@ def main() -> None:
         presets=args.presets,
         hyperparameters=hyperparameters,
         verbosity=args.verbosity,
+        time_limit=None,
+        num_bag_folds=5,
+        num_stack_levels=1,
+        refit_full=False,
     )
 
     leaderboard = predictor.leaderboard(test_data, silent=True)
     args.leaderboard_path.parent.mkdir(parents=True, exist_ok=True)
     leaderboard.to_csv(args.leaderboard_path, index=False)
+
+    leaderboard_train = predictor.leaderboard(train_data, silent=True)
+    leaderboard_train.to_csv(args.leaderboard_path.parent / "leaderboard_train.csv", index=False)
 
     y_true = test_data[args.target]
     y_pred_proba = predictor.predict_proba(test_data)
