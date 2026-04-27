@@ -89,7 +89,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("results/xgboost_survival_gpu_results.txt"),
     )
     parser.add_argument("--cv", type=int, default=5)
-    parser.add_argument("--n-jobs", type=int, default=-1)
+    parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--xgb-n-jobs", type=int, default=1)
     parser.add_argument("--perm-repeats", type=int, default=10)
     parser.add_argument("--random-state", type=int, default=42)
@@ -196,6 +196,7 @@ def make_xgb_model(random_state: int, xgb_n_jobs: int, mode: str) -> XGBRegresso
         "random_state": random_state,
         "verbosity": 0,
         "n_jobs": xgb_n_jobs,
+        "max_delta_step": 1,
     }
 
     if mode == "gpu_hist":
@@ -307,6 +308,8 @@ def select_xgb_mode(
 
 def rsf_like_cindex_scorer(estimator, x, y_surv) -> float:
     risk = estimator.predict(x)
+    risk = np.clip(risk, -1e6, 1e6)
+
     return float(concordance_index_censored(y_surv["event"], y_surv["time"], risk)[0])
 
 
@@ -350,14 +353,14 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [300, 600],
-        "model__max_depth": [3, 5, 7],
-        "model__learning_rate": [0.03, 0.07, 0.1],
-        "model__subsample": [0.8, 1.0],
-        "model__colsample_bytree": [0.8, 1.0],
-        "model__min_child_weight": [1, 5],
-        "model__reg_alpha": [0.0, 0.5],
-        "model__reg_lambda": [1.0, 3.0],
+        "model__n_estimators": [100, 300],
+        "model__max_depth": [2, 3, 4],
+        "model__learning_rate": [0.01, 0.03],
+        "model__subsample": [0.8],
+        "model__colsample_bytree": [0.8],
+        "model__min_child_weight": [5, 10],
+        "model__reg_alpha": [0.5, 1.0],
+        "model__reg_lambda": [3.0, 5.0],
     }
 
     # Survival com evento raro pode gerar folds sem eventos com KFold comum.

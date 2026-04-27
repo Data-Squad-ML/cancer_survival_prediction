@@ -221,6 +221,7 @@ def main() -> None:
         num_bag_folds=5,
         num_stack_levels=1,
         refit_full=False,
+        set_best_to_refit_full=False,
     )
 
     leaderboard = predictor.leaderboard(test_data, silent=True)
