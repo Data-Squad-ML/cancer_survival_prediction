@@ -1,0 +1,1191 @@
+Warning: path already exists! This predictor may overwrite an existing predictor! path="results/autogluon_tabular_models"
+Verbosity: 2 (Standard Logging)
+=================== System Info ===================
+AutoGluon Version:  1.4.0
+Python Version:     3.12.13
+Operating System:   Linux
+Platform Machine:   x86_64
+Platform Version:   #170-Ubuntu SMP Wed Oct 1 10:06:56 UTC 2025
+CPU Count:          40
+Memory Avail:       55.72 GB / 125.54 GB (44.4%)
+Disk Space Avail:   352.78 GB / 3666.32 GB (9.6%)
+===================================================
+Presets specified: ['high_quality']
+Setting dynamic_stacking from 'auto' to True. Reason: Enable dynamic_stacking when use_bag_holdout is disabled. (use_bag_holdout=False)
+Stack configuration (auto_stack=True): num_stack_levels=1, num_bag_folds=5, num_bag_sets=1
+Note: `save_bag_folds=False`! This will greatly reduce peak disk usage during fit (by ~5x), but runs the risk of an out-of-memory error during model refit if memory is small relative to the data size.
+	You can avoid this risk by setting `save_bag_folds=True`.
+DyStack is enabled (dynamic_stacking=True). AutoGluon will try to determine whether the input data is affected by stacked overfitting and enable or disable stacking as a consequence.
+	This is used to identify the optimal `num_stack_levels` value. Copies of AutoGluon will be fit on subsets of the data. Then holdout validation data is used to detect stacked overfitting.
+	Warning: No time limit provided for DyStack. This could take awhile.
+	Running DyStack sub-fit in a ray process to avoid memory leakage. Enabling ray logging (enable_ray_logging=True). Specify `ds_args={'enable_ray_logging': False}` if you experience logging issues.
+2026-04-26 20:51:52,745	INFO worker.py:1843 -- Started a local Ray instance. View the dashboard at [1m[32mhttp://127.0.0.1:8266 [39m[22m
+		Context path: "/home/f-ec2021/ra234618/results/autogluon_tabular_models/ds_sub_fit/sub_fit_ho"
+[36m(_dystack pid=2730095)[0m Running DyStack sub-fit ...
+[36m(_dystack pid=2730095)[0m Beginning AutoGluon training ...
+[36m(_dystack pid=2730095)[0m AutoGluon will save models to "/home/f-ec2021/ra234618/results/autogluon_tabular_models/ds_sub_fit/sub_fit_ho"
+[36m(_dystack pid=2730095)[0m Train Data Rows:    52237
+[36m(_dystack pid=2730095)[0m Train Data Columns: 84
+[36m(_dystack pid=2730095)[0m Label Column:       status_vital
+[36m(_dystack pid=2730095)[0m Problem Type:       binary
+[36m(_dystack pid=2730095)[0m Preprocessing data ...
+[36m(_dystack pid=2730095)[0m Selected class <--> label mapping:  class 1 = 1, class 0 = 0
+[36m(_dystack pid=2730095)[0m Using Feature Generators to preprocess the data ...
+[36m(_dystack pid=2730095)[0m Fitting AutoMLPipelineFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 	Available Memory:                    52999.97 MB
+[36m(_dystack pid=2730095)[0m 	Train Data (Original)  Memory Usage: 33.48 MB (0.1% of available memory)
+[36m(_dystack pid=2730095)[0m 	Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+[36m(_dystack pid=2730095)[0m 	Stage 1 Generators:
+[36m(_dystack pid=2730095)[0m 		Fitting AsTypeFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 			Note: Converting 68 features to boolean dtype as they only contain 2 unique values.
+[36m(_dystack pid=2730095)[0m 	Stage 2 Generators:
+[36m(_dystack pid=2730095)[0m 		Fitting FillNaFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 	Stage 3 Generators:
+[36m(_dystack pid=2730095)[0m 		Fitting IdentityFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 	Stage 4 Generators:
+[36m(_dystack pid=2730095)[0m 		Fitting DropUniqueFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 	Stage 5 Generators:
+[36m(_dystack pid=2730095)[0m 		Fitting DropDuplicatesFeatureGenerator...
+[36m(_dystack pid=2730095)[0m 	Unused Original Features (Count: 3): ['base_diagnostico_microscopica_1', 'historico_tabagismo_clinico_None', 'historico_alcoolismo_clinico_None']
+[36m(_dystack pid=2730095)[0m 		These features were not used to generate any of the output features. Add a feature generator compatible with these features to utilize them.
+[36m(_dystack pid=2730095)[0m 		Features can also be unused if they carry very little information, such as being categorical but having almost entirely unique values or being duplicates of other features.
+[36m(_dystack pid=2730095)[0m 		These features do not need to be present at inference time.
+[36m(_dystack pid=2730095)[0m 		('int', []) : 3 | ['base_diagnostico_microscopica_1', 'historico_tabagismo_clinico_None', 'historico_alcoolismo_clinico_None']
+[36m(_dystack pid=2730095)[0m 	Types of features in original data (raw dtype, special dtypes):
+[36m(_dystack pid=2730095)[0m 		('float', []) :  7 | ['idade', 'tempo_ate_consulta', 'tempo_ate_tratamento', 'tipo_histologico_tumor_te', 'subcat_localizacao_primaria_te', ...]
+[36m(_dystack pid=2730095)[0m 		('int', [])   : 74 | ['tipo_caso', 'sexo', 'historico_familiar_cancer', 'mais_de_um_tumor_primario', 'escolaridade', ...]
+[36m(_dystack pid=2730095)[0m 	Types of features in processed data (raw dtype, special dtypes):
+[36m(_dystack pid=2730095)[0m 		('float', [])     :  7 | ['idade', 'tempo_ate_consulta', 'tempo_ate_tratamento', 'tipo_histologico_tumor_te', 'subcat_localizacao_primaria_te', ...]
+[36m(_dystack pid=2730095)[0m 		('int', [])       :  9 | ['mais_de_um_tumor_primario', 'escolaridade', 't_tnm', 'n_tnm', 'm_tnm', ...]
+[36m(_dystack pid=2730095)[0m 		('int', ['bool']) : 65 | ['tipo_caso', 'sexo', 'historico_familiar_cancer', 'historico_tabagismo_info_ausente', 'historico_alcoolismo_info_ausente', ...]
+[36m(_dystack pid=2730095)[0m 	67.4s = Fit runtime
+[36m(_dystack pid=2730095)[0m 	81 features in original data used to generate 81 features in processed data.
+[36m(_dystack pid=2730095)[0m 	Train Data (Processed) Memory Usage: 9.61 MB (0.0% of available memory)
+[36m(_dystack pid=2730095)[0m Data preprocessing and feature engineering runtime = 68.89s ...
+[36m(_dystack pid=2730095)[0m AutoGluon will gauge predictive performance using evaluation metric: 'roc_auc'
+[36m(_dystack pid=2730095)[0m 	This metric expects predicted probabilities rather than predicted class labels, so you'll need to use predict_proba() instead of predict()
+[36m(_dystack pid=2730095)[0m 	To change this, specify the eval_metric parameter of Predictor()
+[36m(_dystack pid=2730095)[0m User-specified model hyperparameters to be fit:
+[36m(_dystack pid=2730095)[0m {
+[36m(_dystack pid=2730095)[0m 	'GBM': [{'ag_args_fit': {'num_gpus': 1}}],
+[36m(_dystack pid=2730095)[0m 	'XGB': [{'ag_args_fit': {'num_gpus': 1}}],
+[36m(_dystack pid=2730095)[0m 	'CAT': [{'ag_args_fit': {'num_gpus': 1}}],
+[36m(_dystack pid=2730095)[0m 	'NN_TORCH': [{'ag_args_fit': {'num_gpus': 1}}],
+[36m(_dystack pid=2730095)[0m 	'RF': [{}],
+[36m(_dystack pid=2730095)[0m 	'XT': [{}],
+[36m(_dystack pid=2730095)[0m }
+[36m(_dystack pid=2730095)[0m AutoGluon will fit 2 stack levels (L1 to L2) ...
+[36m(_dystack pid=2730095)[0m Fitting 6 L1 models, fit_strategy="sequential" ...
+[36m(_dystack pid=2730095)[0m Fitting model: LightGBM_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.16%)
+[36m(_ray_fit pid=2736114)[0m 	Training S1F1 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2736114)[0m 1 warning generated.
+[36m(_ray_fit pid=2740277)[0m 	Training S1F2 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_ray_fit pid=2741250)[0m 	Training S1F3 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_ray_fit pid=2742095)[0m 	Training S1F4 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_ray_fit pid=2747729)[0m 	Training S1F5 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_dystack pid=2730095)[0m 	0.8799	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	1212.98s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	20.68s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting model: RandomForest_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m 	0.8735	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	108.98s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	195.67s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting model: CatBoost_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=1.01%)
+[36m(_ray_fit pid=2755252)[0m 	Training S1F1 with GPU, note that this may negatively impact model quality compared to CPU training.
+[36m(_ray_fit pid=2755252)[0m 	Warning: CatBoost on GPU is experimental. If you encounter issues, use CPU for training CatBoost instead.
+[36m(_ray_fit pid=2755252)[0m Warning: less than 75% GPU memory available for training. Free: 157.0625 Total: 11165.1875
+[36m(_ray_fit pid=2811983)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2811983)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2811983)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2811983)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2811983)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2811983)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2811983)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2811983)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2811983)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2811983)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2811983)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2811983)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2811983)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2811983)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2811983)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2811983)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2811983)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2811983)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2811983)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2811983)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2811983)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2811983)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2811983)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2811983)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2811983)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_ray_fit pid=2811983)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused CatBoost_BAG_L1 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2811983, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2811983, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Fitting model: ExtraTrees_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	0.8696	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	96.87s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	168.83s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting model: XGBoost_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.22%)
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused XGBoost_BAG_L1 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2817865, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2817865, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2817865)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2817865)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2817865)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2817865)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2817865)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2817865)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2817865)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2817865)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2817865)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2817865)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2817865)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2817865)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2817865)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2817865)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2817865)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2817865)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_dystack pid=2730095)[0m Fitting model: NeuralNetTorch_BAG_L1 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.11%)
+[36m(_ray_fit pid=2818172)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m Traceback (most recent call last):[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m No module named 'numpy._core.numeric'[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m     obj = self._deserialize_object(data, metadata, object_ref)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m     return self._deserialize_msgpack_data(data, metadata_fields)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818172)[0m     obj = pickle.loads(in_band, buffers=buffers)[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused NeuralNetTorch_BAG_L1 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2818172, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2818172, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Fitting model: WeightedEnsemble_L2 ...
+[36m(_dystack pid=2730095)[0m 	Ensemble Weights: {'LightGBM_BAG_L1': 0.625, 'ExtraTrees_BAG_L1': 0.208, 'RandomForest_BAG_L1': 0.167}
+[36m(_dystack pid=2730095)[0m 	0.8839	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	1.44s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	0.01s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting 6 L2 models, fit_strategy="sequential" ...
+[36m(_dystack pid=2730095)[0m Fitting model: LightGBM_BAG_L2 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.16%)
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused LightGBM_BAG_L2 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2818483, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2818483, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 4x across cluster][0m
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 4x across cluster][0m
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 4x across cluster][0m
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 4x across cluster][0m
+[36m(_dystack pid=2730095)[0m Traceback (most recent call last):[32m [repeated 2x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2818483)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2818483)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2818483)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2818483)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2818483)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2818483)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2818483)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2818483)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2818483)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2818483)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2818483)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2818483)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2818483)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2818483)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2818483)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_dystack pid=2730095)[0m Fitting model: RandomForest_BAG_L2 ...
+[36m(_dystack pid=2730095)[0m 	0.8793	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	12.63s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	7.65s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting model: CatBoost_BAG_L2 ...
+[36m(_ray_fit pid=2818483)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2818483)[0m Traceback (most recent call last):[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.82%)
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused CatBoost_BAG_L2 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2819114, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2819114, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819114)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819114)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819114)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819114)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819114)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819114)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2819114)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819114)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819114)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819114)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819114)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819114)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2819114)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819114)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819114)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819114)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819114)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819114)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819114)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_dystack pid=2730095)[0m Fitting model: ExtraTrees_BAG_L2 ...
+[36m(_dystack pid=2730095)[0m 	0.8791	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	7.03s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	8.81s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m Fitting model: XGBoost_BAG_L2 ...
+[36m(_ray_fit pid=2819114)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819114)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819114)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819114)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819114)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.20%)
+[36m(_ray_fit pid=2819692)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819692)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819692)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819692)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819692)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819692)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2819692)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819692)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819692)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819692)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819692)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819692)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2819692)[0m No module named 'numpy._core.numeric'
+[36m(_ray_fit pid=2819692)[0m Traceback (most recent call last):
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects
+[36m(_ray_fit pid=2819692)[0m     obj = self._deserialize_object(data, metadata, object_ref)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object
+[36m(_ray_fit pid=2819692)[0m     return self._deserialize_msgpack_data(data, metadata_fields)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data
+[36m(_ray_fit pid=2819692)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)
+[36m(_ray_fit pid=2819692)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data
+[36m(_ray_fit pid=2819692)[0m     obj = pickle.loads(in_band, buffers=buffers)
+[36m(_ray_fit pid=2819692)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819692)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819692)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819692)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819692)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused XGBoost_BAG_L2 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2819692, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2819692, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Fitting model: NeuralNetTorch_BAG_L2 ...
+[36m(_dystack pid=2730095)[0m 	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.10%)
+[36m(_ray_fit pid=2819826)[0m No module named 'numpy._core.numeric'[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m Traceback (most recent call last):[32m [repeated 4x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 460, in deserialize_objects[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m     obj = self._deserialize_object(data, metadata, object_ref)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 317, in _deserialize_object[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m     return self._deserialize_msgpack_data(data, metadata_fields)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 272, in _deserialize_msgpack_data[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m     python_objects = self._deserialize_pickle5_data(pickle5_data)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/serialization.py", line 260, in _deserialize_pickle5_data[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m     obj = pickle.loads(in_band, buffers=buffers)[32m [repeated 3x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 5x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 5x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 5x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 6x across cluster][0m
+[36m(_ray_fit pid=2819826)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 5x across cluster][0m
+[36m(_dystack pid=2730095)[0m 	Warning: Exception caused NeuralNetTorch_BAG_L2 to fail during training... Skipping this model.
+[36m(_dystack pid=2730095)[0m 		[36mray::_ray_fit()[39m (pid=2819826, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Detailed Traceback:
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+[36m(_dystack pid=2730095)[0m     model = self._train_single(**model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+[36m(_dystack pid=2730095)[0m     model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+[36m(_dystack pid=2730095)[0m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+[36m(_dystack pid=2730095)[0m     out = self._fit(**kwargs)
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+[36m(_dystack pid=2730095)[0m     return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+[36m(_dystack pid=2730095)[0m     self._fit_folds(
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+[36m(_dystack pid=2730095)[0m     fold_fitting_strategy.after_all_folds_scheduled()
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+[36m(_dystack pid=2730095)[0m     self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+[36m(_dystack pid=2730095)[0m     self._process_fold_results(finished, unfinished, fold_ctx)
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     raise processed_exception
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+[36m(_dystack pid=2730095)[0m     fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+[36m(_dystack pid=2730095)[0m                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+[36m(_dystack pid=2730095)[0m     return fn(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+[36m(_dystack pid=2730095)[0m     return func(*args, **kwargs)
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+[36m(_dystack pid=2730095)[0m     values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+[36m(_dystack pid=2730095)[0m                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[36m(_dystack pid=2730095)[0m   File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+[36m(_dystack pid=2730095)[0m     raise value.as_instanceof_cause()
+[36m(_dystack pid=2730095)[0m ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2819826, ip=143.106.73.140)
+[36m(_dystack pid=2730095)[0m   At least one of the input arguments for this task could not be computed:
+[36m(_dystack pid=2730095)[0m ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+[36m(_dystack pid=2730095)[0m traceback: Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m Fitting model: WeightedEnsemble_L3 ...
+[36m(_dystack pid=2730095)[0m 	Ensemble Weights: {'LightGBM_BAG_L1': 0.478, 'ExtraTrees_BAG_L2': 0.304, 'RandomForest_BAG_L2': 0.174, 'ExtraTrees_BAG_L1': 0.043}
+[36m(_dystack pid=2730095)[0m 	0.8855	 = Validation score   (roc_auc)
+[36m(_dystack pid=2730095)[0m 	1.91s	 = Training   runtime
+[36m(_dystack pid=2730095)[0m 	0.02s	 = Validation runtime
+[36m(_dystack pid=2730095)[0m AutoGluon training complete, total runtime = 6142.58s ... Best model: WeightedEnsemble_L3 | Estimated inference throughput: 107.8 rows/s (10448 batch size)
+[36m(_dystack pid=2730095)[0m TabularPredictor saved. To load, use: predictor = TabularPredictor.load("/home/f-ec2021/ra234618/results/autogluon_tabular_models/ds_sub_fit/sub_fit_ho")
+[36m(_dystack pid=2730095)[0m Traceback (most recent call last):
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[32m [repeated 3x across cluster][0m
+[36m(_dystack pid=2730095)[0m ModuleNotFoundError: No module named 'numpy._core.numeric'[32m [repeated 2x across cluster][0m
+[36m(_dystack pid=2730095)[0m Deleting DyStack predictor artifacts (clean_up_fits=True) ...
+Leaderboard on holdout data (DyStack):
+                 model  score_holdout  score_val eval_metric  pred_time_test  pred_time_val     fit_time  pred_time_test_marginal  pred_time_val_marginal  fit_time_marginal  stack_level  can_infer  fit_order
+0  RandomForest_BAG_L1       0.881690   0.873468     roc_auc        1.523309     195.665659   108.983874                 1.523309              195.665659         108.983874            1       True          2
+1    ExtraTrees_BAG_L1       0.876389   0.869600     roc_auc        2.609915     168.831856    96.868832                 2.609915              168.831856          96.868832            1       True          3
+2  WeightedEnsemble_L3            NaN   0.885506     roc_auc             NaN     401.659810  1440.399944                      NaN                0.016611           1.912878            3      False          7
+3  WeightedEnsemble_L2            NaN   0.883913     roc_auc             NaN     385.190152  1420.276019                      NaN                0.012393           1.444979            2      False          4
+4      LightGBM_BAG_L1            NaN   0.879870     roc_auc             NaN      20.680243  1212.978333                      NaN               20.680243        1212.978333            1      False          1
+5  RandomForest_BAG_L2            NaN   0.879345     roc_auc             NaN     392.830251  1431.457372                      NaN                7.652493          12.626332            2      False          5
+6    ExtraTrees_BAG_L2            NaN   0.879086     roc_auc             NaN     393.990707  1425.860734                      NaN                8.812948           7.029695            2      False          6
+	1	 = Optimal   num_stack_levels (Stacked Overfitting Occurred: False)
+	6284s	 = DyStack   runtime
+Starting main fit with num_stack_levels=1.
+	For future fit calls on this dataset, you can skip DyStack to save time: `predictor.fit(..., dynamic_stacking=False, num_stack_levels=1)`
+Beginning AutoGluon training ...
+AutoGluon will save models to "/home/f-ec2021/ra234618/results/autogluon_tabular_models"
+Train Data Rows:    58767
+Train Data Columns: 84
+Label Column:       status_vital
+Problem Type:       binary
+Preprocessing data ...
+Selected class <--> label mapping:  class 1 = 1, class 0 = 0
+Using Feature Generators to preprocess the data ...
+Fitting AutoMLPipelineFeatureGenerator...
+	Available Memory:                    64194.24 MB
+	Train Data (Original)  Memory Usage: 37.66 MB (0.1% of available memory)
+	Inferring data type of each feature based on column values. Set feature_metadata_in to manually specify special dtypes of the features.
+	Stage 1 Generators:
+		Fitting AsTypeFeatureGenerator...
+			Note: Converting 68 features to boolean dtype as they only contain 2 unique values.
+	Stage 2 Generators:
+		Fitting FillNaFeatureGenerator...
+	Stage 3 Generators:
+		Fitting IdentityFeatureGenerator...
+	Stage 4 Generators:
+		Fitting DropUniqueFeatureGenerator...
+	Stage 5 Generators:
+		Fitting DropDuplicatesFeatureGenerator...
+	Unused Original Features (Count: 3): ['base_diagnostico_microscopica_1', 'historico_tabagismo_clinico_None', 'historico_alcoolismo_clinico_None']
+		These features were not used to generate any of the output features. Add a feature generator compatible with these features to utilize them.
+		Features can also be unused if they carry very little information, such as being categorical but having almost entirely unique values or being duplicates of other features.
+		These features do not need to be present at inference time.
+		('int', []) : 3 | ['base_diagnostico_microscopica_1', 'historico_tabagismo_clinico_None', 'historico_alcoolismo_clinico_None']
+	Types of features in original data (raw dtype, special dtypes):
+		('float', []) :  7 | ['idade', 'tempo_ate_consulta', 'tempo_ate_tratamento', 'tipo_histologico_tumor_te', 'subcat_localizacao_primaria_te', ...]
+		('int', [])   : 74 | ['tipo_caso', 'sexo', 'historico_familiar_cancer', 'mais_de_um_tumor_primario', 'escolaridade', ...]
+	Types of features in processed data (raw dtype, special dtypes):
+		('float', [])     :  7 | ['idade', 'tempo_ate_consulta', 'tempo_ate_tratamento', 'tipo_histologico_tumor_te', 'subcat_localizacao_primaria_te', ...]
+		('int', [])       :  9 | ['mais_de_um_tumor_primario', 'escolaridade', 't_tnm', 'n_tnm', 'm_tnm', ...]
+		('int', ['bool']) : 65 | ['tipo_caso', 'sexo', 'historico_familiar_cancer', 'historico_tabagismo_info_ausente', 'historico_alcoolismo_info_ausente', ...]
+	1.9s = Fit runtime
+	81 features in original data used to generate 81 features in processed data.
+	Train Data (Processed) Memory Usage: 10.82 MB (0.0% of available memory)
+Data preprocessing and feature engineering runtime = 1.99s ...
+AutoGluon will gauge predictive performance using evaluation metric: 'roc_auc'
+	This metric expects predicted probabilities rather than predicted class labels, so you'll need to use predict_proba() instead of predict()
+	To change this, specify the eval_metric parameter of Predictor()
+User-specified model hyperparameters to be fit:
+{
+	'GBM': [{'ag_args_fit': {'num_gpus': 1}}],
+	'XGB': [{'ag_args_fit': {'num_gpus': 1}}],
+	'CAT': [{'ag_args_fit': {'num_gpus': 1}}],
+	'NN_TORCH': [{'ag_args_fit': {'num_gpus': 1}}],
+	'RF': [{}],
+	'XT': [{}],
+}
+AutoGluon will fit 2 stack levels (L1 to L2) ...
+Fitting 6 L1 models, fit_strategy="sequential" ...
+Fitting model: LightGBM_BAG_L1 ...
+	Warning: Exception caused LightGBM_BAG_L1 to fail during training (ImportError)... Skipping this model.
+		`import lightgbm` failed. A quick tip is to install via `pip install autogluon.tabular[lightgbm]==1.4.0`.
+Fitting model: RandomForest_BAG_L1 ...
+	0.8749	 = Validation score   (roc_auc)
+	5.57s	 = Training   runtime
+	6.68s	 = Validation runtime
+Fitting model: CatBoost_BAG_L1 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.81%)
+	Warning: Exception caused CatBoost_BAG_L1 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2820690, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2820690, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Fitting model: ExtraTrees_BAG_L1 ...
+	0.8703	 = Validation score   (roc_auc)
+	4.86s	 = Training   runtime
+	7.01s	 = Validation runtime
+Fitting model: XGBoost_BAG_L1 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.20%)
+	Warning: Exception caused XGBoost_BAG_L1 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2820689, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2820689, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Fitting model: NeuralNetTorch_BAG_L1 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.10%)
+	Warning: Exception caused NeuralNetTorch_BAG_L1 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2821143, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2821143, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Fitting model: WeightedEnsemble_L2 ...
+	Ensemble Weights: {'RandomForest_BAG_L1': 0.636, 'ExtraTrees_BAG_L1': 0.364}
+	0.8776	 = Validation score   (roc_auc)
+	0.52s	 = Training   runtime
+	0.01s	 = Validation runtime
+Fitting 6 L2 models, fit_strategy="sequential" ...
+Fitting model: LightGBM_BAG_L2 ...
+	Warning: Exception caused LightGBM_BAG_L2 to fail during training (ImportError)... Skipping this model.
+		`import lightgbm` failed. A quick tip is to install via `pip install autogluon.tabular[lightgbm]==1.4.0`.
+Fitting model: RandomForest_BAG_L2 ...
+	0.8773	 = Validation score   (roc_auc)
+	4.21s	 = Training   runtime
+	6.31s	 = Validation runtime
+Fitting model: CatBoost_BAG_L2 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.85%)
+	Warning: Exception caused CatBoost_BAG_L2 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2821206, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2821206, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1777253834.333665 2732550 chttp2_transport.cc:1182] ipv4:143.106.73.140:37279: Got goaway [2] err=UNAVAILABLE:GOAWAY received; Error code: 2; Debug Text: Cancelling all calls {grpc_status:14, http2_error:2, created_time:"2026-04-26T22:37:14.313341864-03:00"}
+Fitting model: ExtraTrees_BAG_L2 ...
+	0.8769	 = Validation score   (roc_auc)
+	4.39s	 = Training   runtime
+	7.14s	 = Validation runtime
+Fitting model: XGBoost_BAG_L2 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.21%)
+	Warning: Exception caused XGBoost_BAG_L2 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2821660, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2821660, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Fitting model: NeuralNetTorch_BAG_L2 ...
+	Fitting 5 child models (S1F1 - S1F5) | Fitting with ParallelLocalFoldFittingStrategy (5.0 workers, per: cpus=1, gpus=1, memory=0.11%)
+	Warning: Exception caused NeuralNetTorch_BAG_L2 to fail during training... Skipping this model.
+		[36mray::_ray_fit()[39m (pid=2822029, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Detailed Traceback:
+Traceback (most recent call last):
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2171, in _train_and_save
+    model = self._train_single(**model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/tabular/trainer/abstract_trainer.py", line 2055, in _train_single
+    model = model.fit(X=X, y=y, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, total_resources=total_resources, **model_fit_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/abstract/abstract_model.py", line 1068, in fit
+    out = self._fit(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/stacker_ensemble_model.py", line 270, in _fit
+    return super()._fit(X=X, y=y, time_limit=time_limit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 389, in _fit
+    self._fit_folds(
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/bagged_ensemble_model.py", line 868, in _fit_folds
+    fold_fitting_strategy.after_all_folds_scheduled()
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 723, in after_all_folds_scheduled
+    self._run_parallel(X, y, X_pseudo, y_pseudo, model_base_ref, time_limit_fold, head_node_id)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 664, in _run_parallel
+    self._process_fold_results(finished, unfinished, fold_ctx)
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 620, in _process_fold_results
+    raise processed_exception
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/autogluon/core/models/ensemble/fold_fitting_strategy.py", line 583, in _process_fold_results
+    fold_model, pred_proba, time_start_fit, time_end_fit, predict_time, predict_1_time, predict_n_size, fit_num_cpus, fit_num_gpus = self.ray.get(finished)
+                                                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/auto_init_hook.py", line 21, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 2782, in get
+    values, debugger_breakpoint = worker.get_objects(object_refs, timeout=timeout)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/ray/_private/worker.py", line 929, in get_objects
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(RaySystemError): [36mray::_ray_fit()[39m (pid=2822029, ip=143.106.73.140)
+  At least one of the input arguments for this task could not be computed:
+ray.exceptions.RaySystemError: System error: No module named 'numpy._core.numeric'
+traceback: Traceback (most recent call last):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numpy._core.numeric'
+Fitting model: WeightedEnsemble_L3 ...
+	Ensemble Weights: {'RandomForest_BAG_L2': 0.385, 'ExtraTrees_BAG_L2': 0.385, 'RandomForest_BAG_L1': 0.231}
+	0.8813	 = Validation score   (roc_auc)
+	1.06s	 = Training   runtime
+	0.01s	 = Validation runtime
+AutoGluon training complete, total runtime = 76.47s ... Best model: WeightedEnsemble_L3 | Estimated inference throughput: 2164.6 rows/s (58767 batch size)
+TabularPredictor saved. To load, use: predictor = TabularPredictor.load("/home/f-ec2021/ra234618/results/autogluon_tabular_models")
+[36m(autoscaler +1h43m27s)[0m Tip: use `ray status` to view detailed cluster status. To disable these messages, set RAY_SCHEDULER_EVENTS=0.
+[33m(autoscaler +1h43m27s)[0m Warning: The following resource request cannot be scheduled right now: {'CPU': 1.0, 'GPU': 1.0}. This is likely due to all cluster resources being claimed by actors. Consider creating fewer actors or adding more nodes to this Ray cluster.
+[33m(autoscaler +1h44m17s)[0m Warning: The following resource request cannot be scheduled right now: {'CPU': 1.0, 'GPU': 1.0}. This is likely due to all cluster resources being claimed by actors. Consider creating fewer actors or adding more nodes to this Ray cluster.
+Treino AutoGluon finalizado.
+Melhor modelo: WeightedEnsemble_L3
+ROC-AUC teste: 0.883618
+Leaderboard salvo em: results/autogluon_tabular_leaderboard.csv
+Relatorio salvo em: results/autogluon_tabular_results.txt
+I0000 00:00:1777253878.862912 2729633 chttp2_transport.cc:1182] ipv4:143.106.73.140:45953: Got goaway [2] err=UNAVAILABLE:GOAWAY received; Error code: 2; Debug Text: Cancelling all calls {created_time:"2026-04-26T22:37:58.862905095-03:00", http2_error:2, grpc_status:14}
