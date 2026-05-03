@@ -162,8 +162,8 @@ def load_split_data(
     test_df = test_df.dropna(subset=[target, time_col]).copy()
 
     feature_cols = build_feature_columns(train_df, test_df)
-    x_train = train_df[feature_cols].astype(float)
-    x_test = test_df[feature_cols].astype(float)
+    x_train = train_df[feature_cols].astype(np.float32)
+    x_test = test_df[feature_cols].astype(np.float32)
 
     y_train_surv, event_train, time_train = build_survival_targets(
         train_df, target, time_col, event_time_col
@@ -264,7 +264,8 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
     def fit(self, X, y, sample_weight=None):
         event = np.asarray(y["event"]).astype(bool)
         time = np.asarray(y["time"]).astype(float)
-        y_xgb = build_xgb_label(time=time, event=event)
+        y_xgb = build_xgb_label(time=time, event=event).astype(np.float32)
+        X = np.asarray(X, dtype=np.float32)
         self.model_ = self._make_model()
         fit_kwargs = {"sample_weight": sample_weight} if sample_weight is not None else {}
         self.model_.fit(X, y_xgb, **fit_kwargs)
@@ -291,7 +292,7 @@ def select_xgb_mode(
 
     sample_size = min(2048, len(x_train))
     x_sample = x_train.iloc[:sample_size]
-    y_sample = y_train_xgb[:sample_size]
+    y_sample = y_train_xgb[:sample_size].astype(np.float32)
     w_sample = w_train.iloc[:sample_size] if w_train is not None else None
 
     for mode in ["cuda_hist", "gpu_hist"]:
@@ -353,14 +354,14 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [100, 300],
-        "model__max_depth": [2, 3, 4],
-        "model__learning_rate": [0.01, 0.03],
+        "model__n_estimators": [200],
+        "model__max_depth": [3],
+        "model__learning_rate": [0.03],
         "model__subsample": [0.8],
         "model__colsample_bytree": [0.8],
-        "model__min_child_weight": [5, 10],
-        "model__reg_alpha": [0.5, 1.0],
-        "model__reg_lambda": [3.0, 5.0],
+        "model__min_child_weight": [5],
+        "model__reg_alpha": [0.5],
+        "model__reg_lambda": [3.0],
     }
 
     # Survival com evento raro pode gerar folds sem eventos com KFold comum.
