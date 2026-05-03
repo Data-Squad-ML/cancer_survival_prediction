@@ -209,3 +209,6 @@ __marimo__/
 # dataset
 data/raw_inca_registro_hospitalar.parquet
 gpu_ic.txt
+
+# results models autogluon (muito pesados)
+src/scripts/results/autogluon/results1/autogluon_tabular_models/models/
