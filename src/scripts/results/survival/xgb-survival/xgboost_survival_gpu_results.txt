@@ -1,0 +1,131 @@
+======================================================================
+XGBOOST SURVIVAL (GPU/CPU) - RESULTADOS
+======================================================================
+Data/hora: 2026-05-03T20:27:37
+Coluna alvo: status_vital
+Modo de execucao: cuda_hist
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 84
+Uso de class_weight como sample_weight: sim
+KFold (cv): 5
+Estrategia de CV: StratifiedKFold por evento
+Minimo exigido de eventos por fold (validacao): 5
+Minimo observado de eventos por fold (validacao): 1465
+n_jobs (GridSearch/permutation): 1
+xgb_n_jobs (modelo): 1
+Metrica de Grid/CV: C-index (concordance_index_censored)
+
+--- Grid Search com KFold ---
+Melhor score de CV (C-index): 0.669884
+Desvio padrao do melhor score: 0.008680
+Melhores hiperparametros: {'model__colsample_bytree': 0.8, 'model__learning_rate': 0.03, 'model__max_depth': 3, 'model__min_child_weight': 5, 'model__n_estimators': 200, 'model__reg_alpha': 0.5, 'model__reg_lambda': 3.0, 'model__subsample': 0.8}
+
+--- Metricas de Qualidade (treino/teste) ---
+C-index treino       : 0.678079
+C-index teste        : 0.674666
+Gap C-index          : 0.003414
+Uno C-index teste    : 0.729809
+AUC dinamica media   : 0.685064
+Brier medio          : 0.086403
+Integrated Brier (IBS): 0.106565
+
+--- AUC Dinamica por Tempo ---
+    tempo  auc_dinamica
+  90.0000      0.677971
+ 120.6667      0.682239
+ 150.3333      0.681689
+ 182.0000      0.683814
+ 217.3333      0.685500
+ 251.3333      0.686259
+ 282.0000      0.686977
+ 317.6667      0.688220
+ 353.3333      0.688467
+ 387.0000      0.688637
+ 427.6667      0.688585
+ 467.3333      0.688925
+ 508.0000      0.689567
+ 563.3333      0.688597
+ 610.3333      0.689953
+ 661.0000      0.690515
+ 722.6667      0.691551
+ 784.3333      0.690615
+ 897.0000      0.691545
+1043.6667      0.690441
+1181.3333      0.689231
+1386.0000      0.690165
+1603.6667      0.689090
+1888.0000      0.687087
+2307.0000      0.684994
+
+--- Top 20 Feature Importance (gain do XGBoost) ---
+                        feature  importance_gain
+ primeiro_tratamento_hospital_2         0.160123
+      mais_de_um_tumor_primario         0.098771
+                          m_tnm         0.082698
+  uf_procedencia_regiao_Sudeste         0.072410
+ primeiro_tratamento_hospital_4         0.066837
+                          idade         0.064485
+      tipo_histologico_tumor_te         0.060652
+         uf_hospital_regiao_Sul         0.057260
+      uf_procedencia_regiao_Sul         0.055919
+         ocupacao_principal_gap         0.041215
+                         t_ptnm         0.031804
+    cat_localizacao_primaria_te         0.030550
+           tempo_ate_tratamento         0.023627
+                          t_tnm         0.022532
+comportamento_histologico_tumor         0.021331
+    uf_hospital_regiao_Nordeste         0.014392
+    uf_procedencia_regiao_Norte         0.012535
+       uf_hospital_regiao_Norte         0.011986
+                   escolaridade         0.011407
+ uf_procedencia_regiao_Nordeste         0.011051
+
+--- Top 20 Permutation Importance (C-index no teste) ---
+                          feature  importance_mean  importance_std
+        tipo_histologico_tumor_te         0.076291        0.002914
+      cat_localizacao_primaria_te         0.071528        0.003483
+   primeiro_tratamento_hospital_5         0.008238        0.001134
+                           t_ptnm         0.001868        0.000492
+  comportamento_histologico_tumor         0.001702        0.000986
+                            idade         0.001453        0.000273
+   primeiro_tratamento_hospital_2         0.001151        0.000170
+           uf_hospital_regiao_Sul         0.000696        0.000076
+        uf_procedencia_regiao_Sul         0.000636        0.000062
+             tempo_ate_tratamento         0.000519        0.000083
+        mais_de_um_tumor_primario         0.000370        0.000248
+               tempo_ate_consulta         0.000279        0.000117
+                            t_tnm         0.000125        0.000039
+                             sexo         0.000102        0.000028
+           ocupacao_principal_gap         0.000082        0.000285
+   uf_procedencia_regiao_Nordeste         0.000044        0.000055
+                       raca_cor_4         0.000026        0.000014
+                     escolaridade         0.000016        0.000008
+    uf_procedencia_regiao_Sudeste         0.000013        0.000013
+historico_tabagismo_clinico_nunca         0.000010        0.000006
+
+--- Top 20 SHAP Global (mean(|SHAP|)) ---
+                          feature  mean_abs_shap
+        tipo_histologico_tumor_te       0.248154
+      cat_localizacao_primaria_te       0.080846
+                            idade       0.045526
+           uf_hospital_regiao_Sul       0.008945
+   primeiro_tratamento_hospital_2       0.008895
+  comportamento_histologico_tumor       0.006666
+         uf_hospital_regiao_Norte       0.006320
+        uf_procedencia_regiao_Sul       0.005302
+             tempo_ate_tratamento       0.005220
+                           t_ptnm       0.004591
+                            t_tnm       0.004481
+           ocupacao_principal_gap       0.003053
+   primeiro_tratamento_hospital_5       0.003007
+        mais_de_um_tumor_primario       0.002600
+       uf_hospital_regiao_Sudeste       0.001325
+               tempo_ate_consulta       0.001296
+historico_tabagismo_clinico_nunca       0.001263
+   uf_procedencia_regiao_Nordeste       0.001179
+historico_tabagismo_clinico_atual       0.001158
+      uf_hospital_regiao_Nordeste       0.001102
+
+SHAP global CSV: results/xgboost_survival_shap_global.csv
+SHAP summary plot: results/xgboost_survival_shap_summary.png
