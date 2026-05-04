@@ -108,6 +108,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("results/xgboost_survival_shap_summary.png"),
     )
+    parser.add_argument(
+        "--shap-beeswarm-plot",
+        type=Path,
+        default=Path("results/xgboost_survival_shap_beeswarm.png"),
+    )
     parser.add_argument("--shap-max-samples", type=int, default=5000)
     return parser.parse_args()
 
@@ -354,14 +359,14 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [200],
-        "model__max_depth": [3],
-        "model__learning_rate": [0.03],
-        "model__subsample": [0.8],
-        "model__colsample_bytree": [0.8],
-        "model__min_child_weight": [5],
-        "model__reg_alpha": [0.5],
-        "model__reg_lambda": [3.0],
+        "model__n_estimators": [200, 400],
+        "model__max_depth": [2, 3, 4],
+        "model__learning_rate": [0.01, 0.03],
+        "model__subsample": [0.7, 0.85],
+        "model__colsample_bytree": [0.7, 0.85],
+        "model__min_child_weight": [1, 5],
+        "model__reg_alpha": [0.0, 0.5],
+        "model__reg_lambda": [1.0, 3.0],
     }
 
     # Survival com evento raro pode gerar folds sem eventos com KFold comum.
@@ -553,6 +558,7 @@ def compute_and_save_global_shap(
     x_test: pd.DataFrame,
     shap_csv_path: Path,
     shap_plot_path: Path,
+    shap_beeswarm_plot_path: Path,
     shap_max_samples: int,
 ) -> pd.DataFrame:
     try:
@@ -568,6 +574,7 @@ def compute_and_save_global_shap(
 
     shap_csv_path.parent.mkdir(parents=True, exist_ok=True)
     shap_plot_path.parent.mkdir(parents=True, exist_ok=True)
+    shap_beeswarm_plot_path.parent.mkdir(parents=True, exist_ok=True)
 
     imputer = best_model.named_steps["imputer"]
     wrapped_model = best_model.named_steps["model"]
@@ -610,6 +617,16 @@ def compute_and_save_global_shap(
     plt.savefig(shap_plot_path, dpi=200, bbox_inches="tight")
     plt.close()
 
+    shap.summary_plot(
+        shap_values,
+        features=x_imputed_df,
+        feature_names=list(x_test.columns),
+        show=False,
+    )
+    plt.tight_layout()
+    plt.savefig(shap_beeswarm_plot_path, dpi=200, bbox_inches="tight")
+    plt.close()
+
     return shap_global_df
 
 
@@ -633,6 +650,7 @@ def save_results(
     shap_global_df: pd.DataFrame,
     shap_csv_path: Path,
     shap_plot_path: Path,
+    shap_beeswarm_plot_path: Path,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -695,6 +713,7 @@ def save_results(
         "",
         f"SHAP global CSV: {shap_csv_path}",
         f"SHAP summary plot: {shap_plot_path}",
+        f"SHAP beeswarm plot: {shap_beeswarm_plot_path}",
         "",
     ]
 
@@ -766,6 +785,7 @@ def main() -> None:
         x_test=x_test,
         shap_csv_path=args.shap_csv,
         shap_plot_path=args.shap_plot,
+        shap_beeswarm_plot_path=args.shap_beeswarm_plot,
         shap_max_samples=args.shap_max_samples,
     )
 
@@ -795,6 +815,7 @@ def main() -> None:
         shap_global_df=shap_global_df,
         shap_csv_path=args.shap_csv,
         shap_plot_path=args.shap_plot,
+        shap_beeswarm_plot_path=args.shap_beeswarm_plot,
     )
 
     print(f"Treinamento XGBoost Survival concluido. Resultados salvos em: {args.output}")
