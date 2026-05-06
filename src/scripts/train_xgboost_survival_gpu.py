@@ -261,7 +261,12 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
         learning_rate: float = 0.03,
         subsample: float = 0.8,
         colsample_bytree: float = 0.8,
+        colsample_bynode: float = 1.0,
         min_child_weight: float = 1.0,
+        gamma: float = 0.0,
+        max_bin: int | None = None,
+        grow_policy: str | None = None,
+        max_leaves: int = 0,
         reg_alpha: float = 0.0,
         reg_lambda: float = 1.0,
         early_stopping_rounds: int | None = 50,
@@ -276,7 +281,12 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
         self.learning_rate = learning_rate
         self.subsample = subsample
         self.colsample_bytree = colsample_bytree
+        self.colsample_bynode = colsample_bynode
         self.min_child_weight = min_child_weight
+        self.gamma = gamma
+        self.max_bin = max_bin
+        self.grow_policy = grow_policy
+        self.max_leaves = max_leaves
         self.reg_alpha = reg_alpha
         self.reg_lambda = reg_lambda
         self.early_stopping_rounds = early_stopping_rounds
@@ -295,7 +305,12 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
             learning_rate=self.learning_rate,
             subsample=self.subsample,
             colsample_bytree=self.colsample_bytree,
+            colsample_bynode=self.colsample_bynode,
             min_child_weight=self.min_child_weight,
+            gamma=self.gamma,
+            max_bin=self.max_bin,
+            grow_policy=self.grow_policy,
+            max_leaves=self.max_leaves,
             reg_alpha=self.reg_alpha,
             reg_lambda=self.reg_lambda,
         )
