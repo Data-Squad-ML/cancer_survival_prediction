@@ -367,7 +367,12 @@ def select_xgb_mode(
     sample_size = min(2048, len(x_train))
     x_sample = x_train.iloc[:sample_size]
     y_sample = y_train_xgb[:sample_size].astype(np.float32)
-    w_sample = w_train.iloc[:sample_size] if w_train is not None else None
+    if w_train is None:
+        w_sample = None
+    elif hasattr(w_train, "iloc"):
+        w_sample = w_train.iloc[:sample_size]
+    else:
+        w_sample = np.asarray(w_train)[:sample_size]
 
     for mode in ["cuda_hist", "gpu_hist"]:
         try:
