@@ -458,19 +458,19 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [200, 400, 800, 1200],
-        "model__max_depth": [2, 3, 4],
-        "model__learning_rate": [0.01, 0.03],
+        "model__n_estimators": [600, 800, 1000],
+        "model__max_depth": [3, 4, 5],
+        "model__learning_rate": [0.01, 0.02, 0.03],
         "model__subsample": [0.7, 0.85, 1.0],
         "model__colsample_bytree": [0.7, 0.85, 1.0],
         "model__min_child_weight": [1, 5],
-        "model__gamma": [0.0, 0.5, 2.0],
-        "model__max_bin": [256, 512],
+        "model__gamma": [0.0, 0.5],
+        "model__max_bin": [256],
         "model__grow_policy": ["depthwise", "lossguide"],
         "model__max_leaves": [0, 64],
-        "model__colsample_bynode": [0.7, 1.0],
+        "model__colsample_bynode": [1.0],
         "model__reg_alpha": [0.0, 0.5],
-        "model__reg_lambda": [1.0, 3.0, 5.0, 10.0],
+        "model__reg_lambda": [1.0, 3.0],
     }
 
     # Survival com evento raro pode gerar folds sem eventos com KFold comum.
