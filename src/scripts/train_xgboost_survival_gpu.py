@@ -23,7 +23,7 @@ from sksurv.metrics import (
     cumulative_dynamic_auc,
     integrated_brier_score,
 )
-from sksurv.nonparametric import KaplanMeierEstimator
+from sksurv.nonparametric import kaplan_meier_estimator
 from sksurv.util import Surv
 from xgboost import XGBRegressor
 
@@ -171,9 +171,8 @@ def compute_ipcw_weights(y_surv, min_prob: float = 1e-3) -> np.ndarray:
     time = np.asarray(y_surv["time"]).astype(float)
     censor_event = ~event
 
-    km = KaplanMeierEstimator()
-    km.fit(censor_event, time)
-    g_hat = km.predict(time)
+    _, g_hat = kaplan_meier_estimator(censor_event, time)
+    g_hat = np.interp(time, _, g_hat, left=g_hat[0], right=g_hat[-1])
     g_hat = np.clip(g_hat, min_prob, 1.0)
     return (1.0 / g_hat).astype(np.float32)
 
