@@ -16,3 +16,9 @@ Treinamento XGBoost Survival concluido. Resultados salvos em: results/xgboost_su
   risk_score = np.exp(linear_predictor)
 Fitting 5 folds for each of 2916 candidates, totalling 14580 fits
 Treinamento XGBoost Survival concluido. Resultados salvos em: results/xgboost_survival_gpu_results.txt
+/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/numpy/core/fromnumeric.py:88: RuntimeWarning: overflow encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/home/f-ec2021/ra234618/miniconda3/envs/cancer-rf-gpu/lib/python3.12/site-packages/sksurv/linear_model/coxph.py:125: RuntimeWarning: overflow encountered in exp
+  risk_score = np.exp(linear_predictor)
+Fitting 5 folds for each of 3456 candidates, totalling 17280 fits
+Treinamento XGBoost Survival concluido. Resultados salvos em: results/xgboost_survival_gpu_results.txt
