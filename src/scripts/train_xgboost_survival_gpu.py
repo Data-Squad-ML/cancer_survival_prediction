@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.impute import SimpleImputer
 from sklearn.inspection import permutation_importance
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sksurv.linear_model.coxph import BreslowEstimator
 from sksurv.metrics import (
@@ -23,6 +23,7 @@ from sksurv.metrics import (
     cumulative_dynamic_auc,
     integrated_brier_score,
 )
+from sksurv.nonparametric import KaplanMeierEstimator
 from sksurv.util import Surv
 from xgboost import XGBRegressor
 
@@ -99,6 +100,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-eval-times", type=int, default=8)
     parser.add_argument("--max-eval-times", type=int, default=25)
     parser.add_argument(
+        "--weighting",
+        type=str,
+        choices=["ipcw", "class_weight", "none"],
+        default="ipcw",
+        help=(
+            "Peso de amostras. 'ipcw' usa pesos por censura (recomendado para survival), "
+            "'class_weight' usa a coluna class_weight, 'none' desativa pesos."
+        ),
+    )
+    parser.add_argument(
+        "--ipcw-min-prob",
+        type=float,
+        default=1e-3,
+        help="Limite minimo para G_hat(t) no IPCW para evitar pesos extremos.",
+    )
+    parser.add_argument(
         "--shap-csv",
         type=Path,
         default=Path("results/xgboost_survival_shap_global.csv"),
@@ -148,6 +165,19 @@ def build_xgb_label(time: np.ndarray, event: np.ndarray) -> np.ndarray:
     return label
 
 
+def compute_ipcw_weights(y_surv, min_prob: float = 1e-3) -> np.ndarray:
+    """Calcula pesos IPCW com base na distribuicao de censura do treino."""
+    event = np.asarray(y_surv["event"]).astype(bool)
+    time = np.asarray(y_surv["time"]).astype(float)
+    censor_event = ~event
+
+    km = KaplanMeierEstimator()
+    km.fit(censor_event, time)
+    g_hat = km.predict(time)
+    g_hat = np.clip(g_hat, min_prob, 1.0)
+    return (1.0 / g_hat).astype(np.float32)
+
+
 def load_split_data(
     train_path: Path,
     test_path: Path,
@@ -180,7 +210,7 @@ def load_split_data(
     y_train_xgb = build_xgb_label(time_train, event_train)
     y_test_xgb = build_xgb_label(time_test, event_test)
 
-    w_train = train_df["class_weight"].astype(float) if "class_weight" in train_df.columns else None
+    w_class = train_df["class_weight"].astype(float) if "class_weight" in train_df.columns else None
 
     return (
         x_train,
@@ -189,7 +219,7 @@ def load_split_data(
         y_test_surv,
         y_train_xgb,
         y_test_xgb,
-        w_train,
+        w_class,
         feature_cols,
     )
 
@@ -235,6 +265,9 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
         min_child_weight: float = 1.0,
         reg_alpha: float = 0.0,
         reg_lambda: float = 1.0,
+        early_stopping_rounds: int | None = 50,
+        eval_fraction: float = 0.1,
+        eval_metric: str | None = None,
     ):
         self.random_state = random_state
         self.xgb_n_jobs = xgb_n_jobs
@@ -247,6 +280,9 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
         self.min_child_weight = min_child_weight
         self.reg_alpha = reg_alpha
         self.reg_lambda = reg_lambda
+        self.early_stopping_rounds = early_stopping_rounds
+        self.eval_fraction = eval_fraction
+        self.eval_metric = eval_metric
 
     def _make_model(self) -> XGBRegressor:
         model = make_xgb_model(
@@ -272,8 +308,42 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
         y_xgb = build_xgb_label(time=time, event=event).astype(np.float32)
         X = np.asarray(X, dtype=np.float32)
         self.model_ = self._make_model()
+        self.y_train_surv_ = y
+
         fit_kwargs = {"sample_weight": sample_weight} if sample_weight is not None else {}
-        self.model_.fit(X, y_xgb, **fit_kwargs)
+        use_early_stopping = (
+            self.early_stopping_rounds is not None
+            and self.early_stopping_rounds > 0
+            and self.eval_fraction is not None
+            and 0.0 < self.eval_fraction < 0.5
+        )
+
+        if use_early_stopping and len(X) >= 10:
+            stratify = event if event.sum() >= 2 else None
+            X_tr, X_val, y_tr, y_val, w_tr, w_val = train_test_split(
+                X,
+                y_xgb,
+                sample_weight,
+                test_size=self.eval_fraction,
+                random_state=self.random_state,
+                stratify=stratify,
+            )
+            es_kwargs = {
+                "eval_set": [(X_val, y_val)],
+                "early_stopping_rounds": self.early_stopping_rounds,
+                "verbose": False,
+            }
+            if self.eval_metric:
+                es_kwargs["eval_metric"] = self.eval_metric
+
+            fit_kwargs_train = {}
+            if w_tr is not None:
+                fit_kwargs_train["sample_weight"] = w_tr
+                es_kwargs["sample_weight_eval_set"] = [w_val]
+
+            self.model_.fit(X_tr, y_tr, **fit_kwargs_train, **es_kwargs)
+        else:
+            self.model_.fit(X, y_xgb, **fit_kwargs)
         return self
 
     def predict(self, X):
@@ -319,6 +389,13 @@ def rsf_like_cindex_scorer(estimator, x, y_surv) -> float:
     return float(concordance_index_censored(y_surv["event"], y_surv["time"], risk)[0])
 
 
+def uno_cindex_scorer(estimator, x, y_surv) -> float:
+    risk = estimator.predict(x)
+    risk = np.clip(risk, -1e6, 1e6)
+    y_train = getattr(estimator, "y_train_surv_", y_surv)
+    return float(concordance_index_ipcw(y_train, y_surv, risk)[0])
+
+
 def run_training(
     x_train: pd.DataFrame,
     event_train: np.ndarray,
@@ -353,6 +430,9 @@ def run_training(
                     random_state=random_state,
                     xgb_n_jobs=xgb_n_jobs,
                     mode=xgb_mode,
+                    early_stopping_rounds=75,
+                    eval_fraction=0.15,
+                    eval_metric="cox-nloglik",
                 ),
             ),
         ]
@@ -365,6 +445,11 @@ def run_training(
         "model__subsample": [0.7, 0.85, 1.0],
         "model__colsample_bytree": [0.7, 0.85, 1.0],
         "model__min_child_weight": [1, 5],
+        "model__gamma": [0.0, 0.5, 2.0],
+        "model__max_bin": [256, 512],
+        "model__grow_policy": ["depthwise", "lossguide"],
+        "model__max_leaves": [0, 64],
+        "model__colsample_bynode": [0.7, 1.0],
         "model__reg_alpha": [0.0, 0.5],
         "model__reg_lambda": [1.0, 3.0, 5.0, 10.0],
     }
@@ -410,7 +495,7 @@ def run_training(
     grid_search = GridSearchCV(
         estimator=pipeline,
         param_grid=param_grid,
-        scoring=rsf_like_cindex_scorer,
+        scoring=uno_cindex_scorer,
         cv=cv_splits,
         n_jobs=n_jobs,
         verbose=verbose,
@@ -637,6 +722,7 @@ def save_results(
     test_size: int,
     feature_cols: list[str],
     w_train_used: bool,
+    weighting_label: str,
     cv: int,
     min_events_per_fold: int,
     observed_min_events_per_fold: int,
@@ -676,14 +762,15 @@ def save_results(
         f"Amostras de treino: {train_size}",
         f"Amostras de teste: {test_size}",
         f"Total de features selecionadas: {len(feature_cols)}",
-        f"Uso de class_weight como sample_weight: {'sim' if w_train_used else 'nao'}",
+        f"Peso de amostras (treino): {weighting_label}",
+        f"Uso de pesos nas amostras: {'sim' if w_train_used else 'nao'}",
         f"KFold (cv): {cv}",
         "Estrategia de CV: StratifiedKFold por evento",
         f"Minimo exigido de eventos por fold (validacao): {min_events_per_fold}",
         f"Minimo observado de eventos por fold (validacao): {observed_min_events_per_fold}",
         f"n_jobs (GridSearch/permutation): {n_jobs}",
         f"xgb_n_jobs (modelo): {xgb_n_jobs}",
-        "Metrica de Grid/CV: C-index (concordance_index_censored)",
+        "Metrica de Grid/CV: Uno C-index (IPCW)",
         "",
         "--- Grid Search com KFold ---",
         f"Melhor score de CV (C-index): {grid_search.best_score_:.6f}",
@@ -730,7 +817,7 @@ def main() -> None:
         y_test_surv,
         _,
         _,
-        w_train,
+        w_class,
         feature_cols,
     ) = load_split_data(
         train_path=args.train_path,
@@ -739,6 +826,16 @@ def main() -> None:
         time_col=args.time_col,
         event_time_col=args.event_time_col,
     )
+
+    w_train = None
+    weighting_label = "none"
+    if args.weighting == "class_weight":
+        w_train = w_class
+        weighting_label = "class_weight"
+    elif args.weighting == "ipcw":
+        # IPCW corrige vies de censura e costuma melhorar ranking (C-index).
+        w_train = compute_ipcw_weights(y_train_surv, min_prob=args.ipcw_min_prob)
+        weighting_label = f"ipcw(min_prob={args.ipcw_min_prob})"
 
     grid_search, xgb_mode = run_training(
         x_train=x_train,
@@ -802,6 +899,7 @@ def main() -> None:
         test_size=len(x_test),
         feature_cols=feature_cols,
         w_train_used=w_train is not None,
+        weighting_label=weighting_label,
         cv=args.cv,
         min_events_per_fold=args.min_events_per_fold,
         observed_min_events_per_fold=observed_min_events_per_fold,
