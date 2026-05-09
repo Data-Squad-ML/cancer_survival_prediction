@@ -355,7 +355,14 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
                 fit_kwargs_train["sample_weight"] = w_tr
                 es_kwargs["sample_weight_eval_set"] = [w_val]
 
-            self.model_.fit(X_tr, y_tr, **fit_kwargs_train, **es_kwargs)
+            try:
+                self.model_.fit(X_tr, y_tr, **fit_kwargs_train, **es_kwargs)
+            except TypeError as exc:
+                # Versoes antigas do XGBoost nao aceitam early_stopping_rounds no fit.
+                if "early_stopping_rounds" in str(exc):
+                    self.model_.fit(X, y_xgb, **fit_kwargs)
+                else:
+                    raise
         else:
             self.model_.fit(X, y_xgb, **fit_kwargs)
         return self
@@ -466,7 +473,7 @@ def run_training(
         "model__min_child_weight": [1, 5],
         "model__gamma": [0.0, 0.5],
         "model__max_bin": [256],
-        "model__grow_policy": ["depthwise", "lossguide"],
+        "model__grow_policy": ["depthwise"],
         "model__max_leaves": [0, 64],
         "model__colsample_bynode": [1.0],
         "model__reg_alpha": [0.0, 0.5],
