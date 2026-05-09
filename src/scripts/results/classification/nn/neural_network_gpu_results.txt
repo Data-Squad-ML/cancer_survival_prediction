@@ -1,0 +1,50 @@
+======================================================================
+REDE NEURAL MLP GPU (PyTorch) - RESULTADOS
+======================================================================
+Data/hora: 2026-05-08T12:15:08
+Coluna alvo: status_vital
+Dispositivo: cuda
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 84
+Uso de class_weight como sample_weight: sim
+Metrica de Grid/CV: roc_auc (KFold)
+
+--- Grid Search manual com KFold ---
+Melhor score de CV (AUC): 0.870826
+Desvio padrao do melhor score: 0.002834
+Melhores hiperparametros:
+  hidden_sizes: [128, 64]
+  dropout: 0.3
+  lr: 0.0003
+  batch_size: 512
+  epochs: 50
+  activation: leaky_relu
+
+--- Avaliacao AUC ---
+AUC treino: 0.900283
+AUC teste : 0.877932
+Gap       : 0.022351
+
+--- Top 20 Permutation Importance (teste) ---
+                            feature  importance_mean  importance_std
+        cat_localizacao_primaria_te         0.028873        0.002164
+                              m_tnm         0.026411        0.001651
+    razao_nao_tratamento_hospital_6         0.012262        0.001050
+                          tipo_caso         0.011955        0.001306
+                              idade         0.010612        0.000924
+                             n_ptnm         0.009082        0.000611
+                             t_ptnm         0.007842        0.000613
+          tipo_histologico_tumor_te         0.007423        0.000883
+                 tempo_ate_consulta         0.007276        0.000570
+          mais_de_um_tumor_primario         0.006471        0.001024
+diagnostico_tratamento_anteriores_3         0.005665        0.000543
+                              t_tnm         0.005447        0.000613
+          uf_procedencia_regiao_Sul         0.004089        0.000563
+diagnostico_tratamento_anteriores_1         0.003194        0.000525
+    razao_nao_tratamento_hospital_8         0.003163        0.000611
+               tempo_ate_tratamento         0.003012        0.000993
+     primeiro_tratamento_hospital_4         0.002718        0.000569
+    razao_nao_tratamento_hospital_7         0.002529        0.000458
+     primeiro_tratamento_hospital_2         0.002261        0.000291
+                       escolaridade         0.002237        0.000291
