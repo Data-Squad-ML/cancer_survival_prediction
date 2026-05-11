@@ -1,0 +1,87 @@
+======================================================================
+DEEPSURV (Cox MLP) GPU (PyTorch) - RESULTADOS
+======================================================================
+Data/hora: 2026-05-11T01:40:03
+Coluna alvo: status_vital
+Dispositivo: cuda
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 84
+Peso de amostras (treino): ipcw(min_prob=0.001)
+Uso de pesos nas amostras: sim
+KFold (cv): 5
+Estrategia de CV: StratifiedKFold por evento
+Metrica de Grid/CV: Uno C-index (IPCW)
+Loss: Negative Partial Log-Likelihood de Cox (Breslow)
+
+--- Grid Search manual com KFold ---
+Melhor score de CV (Uno C-index): 0.855973
+Desvio padrao do melhor score: 0.022974
+Melhores hiperparametros:
+  hidden_sizes: [256, 128, 64]
+  dropout: 0.3
+  lr: 0.0003
+  batch_size: 512
+  epochs: 75
+  activation: selu
+  l2: 0.0001
+
+--- Metricas de Qualidade (treino/teste) ---
+C-index treino        : 0.858901
+C-index teste         : 0.854102
+Gap C-index           : 0.004798
+Uno C-index teste     : 0.966788
+AUC dinamica media    : 0.884932
+Brier score medio     : 0.067875
+Integrated Brier (IBS): 0.082047
+
+--- AUC Dinamica por Tempo ---
+    tempo  auc_dinamica
+  90.0000      0.898750
+ 120.6667      0.894859
+ 150.3333      0.891362
+ 182.0000      0.893013
+ 217.3333      0.890471
+ 251.3333      0.890370
+ 282.0000      0.886430
+ 317.6667      0.884439
+ 353.3333      0.881187
+ 387.0000      0.879846
+ 427.6667      0.878475
+ 467.3333      0.877492
+ 508.0000      0.877264
+ 563.3333      0.876773
+ 610.3333      0.875123
+ 661.0000      0.874740
+ 722.6667      0.874920
+ 784.3333      0.872992
+ 897.0000      0.871269
+1043.6667      0.870333
+1181.3333      0.869472
+1386.0000      0.869440
+1603.6667      0.867543
+1888.0000      0.865944
+2307.0000      0.863970
+
+--- Top 20 Permutation Importance (Uno C-index no teste) ---
+                            feature  importance_mean  importance_std
+    razao_nao_tratamento_hospital_6         0.398013        0.000206
+                 tempo_ate_consulta         0.042332        0.118586
+                              m_tnm         0.006655        0.000537
+        cat_localizacao_primaria_te         0.005034        0.000582
+                              idade         0.003211        0.000534
+                          tipo_caso         0.002376        0.000294
+          tipo_histologico_tumor_te         0.001990        0.000554
+          mais_de_um_tumor_primario         0.001958        0.000369
+          uf_procedencia_regiao_Sul         0.001641        0.000322
+                             t_ptnm         0.001530        0.000368
+                             n_ptnm         0.001208        0.000141
+             uf_hospital_regiao_Sul         0.000996        0.000232
+     primeiro_tratamento_hospital_4         0.000960        0.000157
+    razao_nao_tratamento_hospital_8         0.000948        0.000206
+     primeiro_tratamento_hospital_2         0.000920        0.000201
+         uf_hospital_regiao_Sudeste         0.000804        0.000180
+diagnostico_tratamento_anteriores_3         0.000699        0.000189
+                              t_tnm         0.000631        0.000216
+diagnostico_tratamento_anteriores_1         0.000492        0.000233
+                       escolaridade         0.000451        0.000180
