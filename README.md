@@ -1,21 +1,20 @@
 # cancer_survival_prediction
 
-Projeto de ciência de dados e machine learning para análise e predição de sobrevivência de pacientes com câncer, com foco em preparação de dados, exploração, codificação de variáveis, modelagem e avaliação de desempenho.
+## Resumo
 
-## Visão geral
+Este repositório apresenta um estudo aplicado de ciência de dados e aprendizado de máquina voltado à análise da sobrevivência de pacientes com câncer. A organização do projeto sugere uma metodologia em etapas, contemplando preparação de dados, exploração estatística, transformação de variáveis, modelagem preditiva e avaliação de desempenho.
 
-Este repositório reúne notebooks e scripts voltados à construção de um pipeline analítico para dados oncológicos. A estrutura sugere um fluxo de trabalho típico de projeto de ML:
+O foco principal é investigar relações entre características clínicas, demográficas e terapêuticas e o desfecho de sobrevivência, por meio de modelos supervisionados clássicos e abordagens survival analysis.
 
-1. **Preparação dos dados**
-2. **Análise exploratória**
-3. **Encoding/feature engineering**
-4. **Treinamento e avaliação de modelos**
+## Contexto metodológico
 
-Além disso, o repositório contém um conjunto de dados em CSV, documentação de dicionário de dados e dependências para reproduzir o ambiente.
+A estrutura do projeto indica um fluxo analítico consistente com pesquisas em dados clínicos:
 
-## Objetivo do projeto
-
-O objetivo principal é explorar dados clínicos e demográficos para entender fatores associados à sobrevivência e apoiar a construção de modelos preditivos para câncer.
+1. construção e refinamento do conjunto de dados;
+2. análise exploratória para identificação de padrões, distribuições e inconsistências;
+3. codificação de variáveis categóricas e engenharia de atributos;
+4. treinamento de modelos de classificação e survival;
+5. comparação de resultados por métricas apropriadas ao problema.
 
 ## Estrutura do repositório
 
@@ -37,57 +36,60 @@ O objetivo principal é explorar dados clínicos e demográficos para entender f
 └── README.md
 ```
 
-## Principais arquivos e pastas
+## Base de dados e documentação
 
-### `src/`
-Contém os notebooks principais do projeto:
+A pasta `data/` reúne os insumos principais para a pesquisa:
 
-- `01_data_preparation.ipynb`: preparação e tratamento inicial dos dados
-- `02_exploratory_data_analysis.ipynb`: análise exploratória
-- `03_feature_encoding.ipynb`: transformação e codificação de variáveis
-- `04_modeling_and_evaluation.ipynb`: treinamento e avaliação de modelos
-- `cancer_brasil.ipynb`: notebook adicional relacionado ao domínio do projeto
-- `scripts/`: espaço para scripts auxiliares ou automações
+- `global_cancer_patients_2015_2024.csv`: base tabular principal utilizada no projeto;
+- `dicionario_inca_registro_hospitalar.pdf`: documento de referência para interpretação das variáveis.
 
-### `data/`
-Contém os dados e a documentação de suporte:
+## Notebooks principais
 
-- `global_cancer_patients_2015_2024.csv`: base principal de pacientes
-- `dicionario_inca_registro_hospitalar.pdf`: dicionário/guia de referência dos dados
+Os notebooks em `src/` organizam o processo analítico em etapas:
 
-### Scripts auxiliares
+- `01_data_preparation.ipynb`: preparação inicial, limpeza e estruturação dos dados;
+- `02_exploratory_data_analysis.ipynb`: exploração descritiva e visualização dos dados;
+- `03_feature_encoding.ipynb`: transformação, codificação e seleção de atributos;
+- `04_modeling_and_evaluation.ipynb`: treinamento e avaliação dos modelos;
+- `cancer_brasil.ipynb`: notebook complementar, possivelmente voltado a análises específicas do conjunto brasileiro.
 
-- `check_nans.py`: verifica colunas com valores ausentes em um parquet de treino
-- `test_nans.py`: imprime o total de NaNs e colunas com ausências
+## Scripts auxiliares
 
-## Tecnologias e dependências
+Os scripts de apoio são usados para inspeções pontuais de qualidade dos dados:
 
-O projeto foi preparado para Python 3.12 e usa bibliotecas de análise e modelagem como:
+- `check_nans.py`: identifica colunas com valores ausentes no conjunto de treino;
+- `test_nans.py`: calcula o total de valores ausentes e lista as colunas afetadas.
 
-- `pandas`
+Esses scripts operam sobre arquivos parquet, o que sugere um estágio intermediário de processamento anterior ao treinamento.
+
+## Ambiente computacional
+
+O projeto foi estruturado para **Python 3.12** e utiliza bibliotecas amplamente empregadas em pesquisa aplicada e modelagem preditiva:
+
 - `numpy`
+- `pandas`
 - `matplotlib`
 - `seaborn`
+- `pyarrow`
 - `scikit-learn`
 - `xgboost`
 - `lightgbm`
 - `scikit-survival`
 - `autogluon.tabular`
 - `shap`
-- `pyarrow`
 
-Veja a lista completa em `requirements.txt`.
+A lista completa está disponível em `requirements.txt`.
 
-## Como executar localmente
+## Reprodutibilidade
 
-### 1. Clonar o repositório
+### Clonagem do repositório
 
 ```bash
 git clone https://github.com/Data-Squad-ML/cancer_survival_prediction.git
 cd cancer_survival_prediction
 ```
 
-### 2. Criar e ativar um ambiente virtual
+### Criação do ambiente virtual
 
 ```bash
 python3.12 -m venv .venv
@@ -95,15 +97,13 @@ source .venv/bin/activate  # Linux/macOS
 # .venv\Scripts\activate   # Windows
 ```
 
-### 3. Instalar as dependências
+### Instalação das dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Abrir os notebooks
-
-Você pode usar Jupyter Notebook, JupyterLab ou VS Code:
+### Execução dos notebooks
 
 ```bash
 jupyter lab
@@ -115,39 +115,99 @@ ou
 jupyter notebook
 ```
 
-## Fluxo sugerido de uso
+## Resultados dos modelos
 
-1. Comece por `01_data_preparation.ipynb` para entender a origem e o tratamento dos dados.
-2. Em seguida, use `02_exploratory_data_analysis.ipynb` para identificar padrões, distribuições e problemas de qualidade.
-3. Aplique codificação e engenharia de atributos em `03_feature_encoding.ipynb`.
-4. Treine e compare modelos em `04_modeling_and_evaluation.ipynb`.
-5. Utilize `check_nans.py` e `test_nans.py` para inspeções rápidas de valores ausentes.
+Os resultados experimentais do projeto estão concentrados em `src/scripts/results/`, o que indica uma organização sistemática dos artefatos de avaliação.
 
-## Verificação de dados faltantes
+### Resultados de classificação
 
-Os scripts incluídos mostram como inspecionar NaNs em um arquivo parquet de treino:
+Em `src/scripts/results/classification/`, encontram-se os outputs dos modelos voltados à tarefa de classificação, incluindo métricas de desempenho e importância de variáveis.
 
-```python
-import pandas as pd
-train_pdf = pd.read_parquet("/Volumes/workspace/default/cancer_data/03_train.parquet")
-nans = train_pdf.isna().sum()
-print(nans[nans > 0])
-```
+Pelos scripts do repositório, os modelos de classificação incluem:
 
-## Observações importantes
+- **Random Forest**
+- **MLP / rede neural**
+- **AutoGluon Tabular**
 
-- O repositório é **privado**.
-- Não há uma descrição formal do projeto no GitHub, então este README foi estruturado com base na organização atual dos arquivos.
-- O caminho do parquet usado nos scripts (`/Volumes/workspace/default/cancer_data/03_train.parquet`) pode precisar ser ajustado ao seu ambiente.
+As saídas típicas geradas por esses experimentos incluem:
 
-## Próximos passos recomendados
+- score de validação cruzada;
+- AUC em treino e teste;
+- gap entre treino e teste;
+- permutation importance;
+- relatório consolidado em TXT ou CSV.
 
-- Adicionar uma seção de **objetivo do modelo** com definição clara da variável-alvo.
-- Documentar o **dataset**: fonte, período, número de linhas, colunas e dicionário de variáveis.
-- Incluir **métricas de avaliação** dos modelos usados no notebook final.
-- Adicionar **figuras** com resultados de EDA e performance.
-- Padronizar os notebooks com comentários e sumário executivo.
+### Resultados de survival analysis
+
+Em `src/scripts/results/survival/`, estão os resultados associados aos modelos de sobrevivência, com foco em métricas mais adequadas ao problema temporal.
+
+Os scripts do repositório sugerem experimentos com:
+
+- **Random Survival Forest**
+- **LightGBM Survival (Cox)**
+- **XGBoost Survival (Cox)**
+- possivelmente outras variações de survival em notebooks e scripts complementares
+
+Entre os artefatos produzidos estão:
+
+- **C-index** de treino, validação e teste;
+- **Uno C-index**;
+- **AUC dinâmica** ao longo do tempo;
+- **Brier score** e **Integrated Brier Score (IBS)**;
+- importâncias por ganho, permutation importance e SHAP;
+- relatórios em texto e tabelas auxiliares em CSV;
+- gráficos de resumo SHAP.
+
+### Interpretação acadêmica dos resultados
+
+A presença simultânea de métricas de classificação e survival sugere uma comparação metodológica entre abordagens diferentes para o mesmo fenômeno clínico. Em termos acadêmicos, isso é relevante porque:
+
+- métricas como **AUC** capturam apenas separação entre classes;
+- métricas survival como **C-index**, **AUC dinâmica** e **IBS** incorporam tempo e censura;
+- explicabilidade por **SHAP** e permutation importance permite discutir fatores potencialmente associados ao desfecho.
+
+Assim, a seção de resultados do repositório não apenas documenta desempenho, mas também contribui para a interpretação clínica dos modelos.
+
+## Modelos e métricas utilizadas
+
+### Classificação
+
+- **Random Forest**
+- **MLP em PyTorch**
+- **AutoGluon Tabular**
+
+Métricas observadas nos scripts:
+
+- ROC-AUC
+- AUC em treino e teste
+- Permutation importance
+
+### Survival analysis
+
+- **Random Survival Forest**
+- **LightGBM Survival (Cox)**
+- **XGBoost Survival (Cox)**
+
+Métricas observadas nos scripts:
+
+- C-index
+- Uno C-index
+- AUC dinâmica
+- Brier score
+- Integrated Brier Score (IBS)
+- SHAP global
+- permutation importance
+
+## Estrutura dos experimentos em `src/scripts/results/`
+
+A organização dos resultados foi desenhada para separar experimentos por família de modelo:
+
+- `classification/`: saídas de modelos classificatórios;
+- `survival/`: saídas dos modelos de análise de sobrevivência;
+- `autogluon/`: resultados específicos do AutoGluon.
+
+Essa separação favorece rastreabilidade, comparação e reprodutibilidade experimental.
 
 ## Licença
 
-Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para detalhes.
+Este projeto está licenciado sob a **MIT License**. Consulte o arquivo `LICENSE` para os termos completos.
