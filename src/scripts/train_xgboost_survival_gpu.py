@@ -358,8 +358,12 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
             try:
                 self.model_.fit(X_tr, y_tr, **fit_kwargs_train, **es_kwargs)
             except TypeError as exc:
-                # Versoes antigas do XGBoost nao aceitam early_stopping_rounds no fit.
-                if "early_stopping_rounds" in str(exc):
+                # Versoes antigas do XGBoost nao aceitam alguns kwargs do early stopping.
+                msg = str(exc)
+                if any(
+                    key in msg
+                    for key in ("early_stopping_rounds", "eval_set", "sample_weight_eval_set")
+                ):
                     self.model_.fit(X, y_xgb, **fit_kwargs)
                 else:
                     raise
@@ -601,11 +605,19 @@ def compute_survival_metrics(
         risk_train,
     )
     survival_functions_test = breslow.get_survival_function(risk_test)
-    survival_prob_test = np.vstack([fn(eval_times) for fn in survival_functions_test])
+    domain_min, domain_max = survival_functions_test[0].domain
+    eps = max((domain_max - domain_min) * 1e-3, 1e-9)
+    clipped_times = eval_times[(eval_times > domain_min + eps) & (eval_times < domain_max - eps)]
+    if len(clipped_times) < 3:
+        clipped_times = np.linspace(domain_min + eps, domain_max - eps, num=5)
 
-    _, brier_scores = brier_score(y_train_surv, y_test_surv, survival_prob_test, eval_times)
+    survival_prob_test = np.vstack([fn(clipped_times) for fn in survival_functions_test])
+
+    _, brier_scores = brier_score(y_train_surv, y_test_surv, survival_prob_test, clipped_times)
     mean_brier = float(np.mean(brier_scores))
-    ibs = float(integrated_brier_score(y_train_surv, y_test_surv, survival_prob_test, eval_times))
+    ibs = float(
+        integrated_brier_score(y_train_surv, y_test_surv, survival_prob_test, clipped_times)
+    )
 
     return {
         "cindex_train": cindex_train,
@@ -616,7 +628,7 @@ def compute_survival_metrics(
         "dynamic_auc_by_time": auc_by_time,
         "mean_brier": mean_brier,
         "ibs": ibs,
-        "eval_times": eval_times,
+        "eval_times": clipped_times,
     }
 
 

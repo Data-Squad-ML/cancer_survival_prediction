@@ -226,7 +226,7 @@ def load_split_data(
 
 def make_lgbm_model(random_state: int, lgbm_n_jobs: int, mode: str) -> LGBMRegressor:
     params = {
-        "objective": "survival:cox",
+        "objective": "survival",
         "metric": "None",
         "random_state": random_state,
         "verbose": -1,
