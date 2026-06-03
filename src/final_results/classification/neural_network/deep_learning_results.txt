@@ -1,0 +1,104 @@
+======================================================================
+DEEP LEARNING PYTORCH - RESULTADOS COMPLETOS
+======================================================================
+Data/hora: 2026-06-02T14:21:45.842648
+Alvo: status_vital
+Dispositivo: cuda
+Features: 84
+Melhores Params: {'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 1024, 'epochs': 100, 'activation': 'relu'}
+
+--- Metricas TREINO ---
+
+  [Discriminacao]
+  AUC-ROC       : 0.958135
+  AUC-PR        : 0.993788   (Average Precision)
+  Gini          : 0.916270
+
+  [Predicao — threshold = 0.5]
+  Accuracy      : 0.845117
+  Precision     : 0.991228
+  Recall        : 0.830398
+  F1-Score      : 0.903713
+  MCC           : 0.581836
+
+  [Calibracao]
+  Brier Score   : 0.102419   (menor e melhor)
+  Log-Loss      : 0.310773
+
+  [Confusion Matrix]
+    6951     378
+    8724   42714
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.44      0.95      0.60      7329
+             1       0.99      0.83      0.90     51438
+  
+      accuracy                           0.85     58767
+     macro avg       0.72      0.89      0.75     58767
+  weighted avg       0.92      0.85      0.87     58767
+
+  [KS / Ganho / Lift por Decil]
+  KS estatistico : 0.774944   (maximo no decil 8)
+
+  Decil   % base    Ganho     Lift
+  -----  -------  -------  -------
+      1     10%   0.1143   1.1425
+      2     20%   0.2285   1.1425
+      3     30%   0.3428   1.1425
+      4     40%   0.4569   1.1421
+      5     50%   0.5709   1.1417
+      6     60%   0.6844   1.1406
+      7     70%   0.7951   1.1358
+      8     80%   0.8967   1.1208 <- KS
+      9     90%   0.9726   1.0806
+     10    100%   1.0000   1.0000
+
+--- Metricas TESTE ---
+
+  [Discriminacao]
+  AUC-ROC       : 0.864135
+  AUC-PR        : 0.976010   (Average Precision)
+  Gini          : 0.728270
+
+  [Predicao — threshold = 0.5]
+  Accuracy      : 0.790158
+  Precision     : 0.958111
+  Recall        : 0.795023
+  F1-Score      : 0.868981
+  MCC           : 0.408307
+
+  [Calibracao]
+  Brier Score   : 0.136529   (menor e melhor)
+  Log-Loss      : 0.411963
+
+  [Confusion Matrix]
+    1385     447
+    2636   10224
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.34      0.76      0.47      1832
+             1       0.96      0.80      0.87     12860
+  
+      accuracy                           0.79     14692
+     macro avg       0.65      0.78      0.67     14692
+  weighted avg       0.88      0.79      0.82     14692
+
+  [KS / Ganho / Lift por Decil]
+  KS estatistico : 0.560300   (maximo no decil 7)
+
+  Decil   % base    Ganho     Lift
+  -----  -------  -------  -------
+      1     10%   0.1138   1.1378
+      2     20%   0.2271   1.1355
+      3     30%   0.3400   1.1331
+      4     40%   0.4515   1.1287
+      5     50%   0.5621   1.1241
+      6     60%   0.6673   1.1120
+      7     70%   0.7699   1.0998 <- KS
+      8     80%   0.8644   1.0804
+      9     90%   0.9483   1.0536
+     10    100%   1.0000   1.0000
