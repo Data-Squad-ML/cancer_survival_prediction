@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Treina Random Forest em GPU (cuML) com metricas completas e exporta arrays para ensemble."""
+"""Treina Random Forest em CPU com metricas completas e exporta arrays para ensemble."""
 
 from __future__ import annotations
 
@@ -9,11 +9,9 @@ from datetime import datetime
 from itertools import product
 from pathlib import Path
 
-import cudf
-import cupy as cp
 import numpy as np
 import pandas as pd
-from cuml.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     accuracy_score,
@@ -82,8 +80,6 @@ def default_data_path(filename: str) -> Path:
 
 
 def _to_numpy(x) -> np.ndarray:
-    if isinstance(x, cp.ndarray):
-        return cp.asnumpy(x)
     if hasattr(x, "to_numpy"):
         return x.to_numpy()
     return np.asarray(x)
@@ -94,7 +90,7 @@ def _to_numpy(x) -> np.ndarray:
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Treino de Random Forest GPU (cuML) com metricas completas e soft voting."
+        description="Treino de Random Forest CPU com metricas completas e soft voting."
     )
     parser.add_argument("--train-path",     type=Path,  default=default_data_path("data_train.csv"))
     parser.add_argument("--test-path",      type=Path,  default=default_data_path("data_test.csv"))
@@ -153,47 +149,48 @@ def get_auc_mode(y: pd.Series) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Modelo cuML
+# Modelo
 # ---------------------------------------------------------------------------
-def sanitize_cuml_params(params: dict) -> dict:
-    """cuML nao aceita max_depth=None; substitui por 64 (equivalente a sem limite)."""
-    p = dict(params)
-    if p.get("max_depth") is None:
-        p["max_depth"] = 64
-    return p
+def sanitize_params(params: dict) -> dict:
+    return dict(params)
 
 
-def _fit_gpu_rf(
+def _fit_rf(
     x_train_df: pd.DataFrame,
     y_train_sr: pd.Series,
     params: dict,
     random_state: int,
     sample_weight: pd.Series | None,
 ) -> RandomForestClassifier:
-    params = sanitize_cuml_params(params)
-    model  = RandomForestClassifier(random_state=random_state, n_streams=1, **params)
+    params = sanitize_params(params)
 
-    x_gpu = cudf.DataFrame.from_pandas(x_train_df)
-    y_gpu = cudf.Series(y_train_sr.reset_index(drop=True))
+    model = RandomForestClassifier(
+        random_state=random_state,
+        n_jobs=-1,
+        **params,
+    )
 
     if sample_weight is not None:
-        w_gpu = cudf.Series(sample_weight.reset_index(drop=True))
-        try:
-            model.fit(x_gpu, y_gpu, sample_weight=w_gpu)
-        except TypeError:
-            model.fit(x_gpu, y_gpu)
+        model.fit(
+            x_train_df,
+            y_train_sr,
+            sample_weight=sample_weight,
+        )
     else:
-        model.fit(x_gpu, y_gpu)
+        model.fit(
+            x_train_df,
+            y_train_sr,
+        )
 
     return model
 
 
 def _predict_proba_numpy(model: RandomForestClassifier, x_df: pd.DataFrame) -> np.ndarray:
-    return _to_numpy(model.predict_proba(cudf.DataFrame.from_pandas(x_df)))
+    return _to_numpy(model.predict_proba(x_df))
 
 
 # ---------------------------------------------------------------------------
-# Grid Search manual (cuML nao suporta GridSearchCV do sklearn diretamente)
+# Grid Search
 # ---------------------------------------------------------------------------
 def _param_grid():
     grid = {
@@ -240,7 +237,7 @@ def run_grid_search(
             y_fv = y_train.iloc[fold_val_idx].to_numpy()
             w_ft = w_train.iloc[fold_train_idx] if w_train is not None else None
 
-            model = _fit_gpu_rf(x_ft, y_ft, params, random_state, w_ft)
+            model = _fit_rf(x_ft, y_ft, params, random_state, w_ft)
             proba = _predict_proba_numpy(model, x_fv)
             fold_scores.append(_compute_auc_np(y_fv, proba, auc_mode))
 
@@ -443,7 +440,7 @@ def format_metrics_block(m: dict, is_binary: bool) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Permutation importance (usa AUC como metrica — mantida em cuML)
+# Permutation importance (usa AUC como metrica)
 # ---------------------------------------------------------------------------
 def permutation_importance_auc(
     model: RandomForestClassifier,
@@ -508,7 +505,7 @@ def save_results(
 
     lines = [
         "=" * 70,
-        "RANDOM FOREST GPU (cuML) - RESULTADOS COMPLETOS",
+        "RANDOM FOREST - RESULTADOS COMPLETOS",
         "=" * 70,
         f"Data/hora              : {datetime.now().isoformat(timespec='seconds')}",
         f"Coluna alvo            : {target}",
@@ -567,7 +564,7 @@ def main() -> None:
         auc_mode=auc_mode,
     )
 
-    best_model = _fit_gpu_rf(
+    best_model = _fit_rf(
         x_train_df=x_train,
         y_train_sr=y_train,
         params=best_params,
@@ -618,7 +615,7 @@ def main() -> None:
         perm_df=perm_df,
     )
 
-    print(f"\nTreinamento em GPU concluido. Resultados salvos em: {args.output}")
+    print(f"\nTreinamento concluido. Resultados salvos em: {args.output}")
     print(f"\nResumo rapido — conjunto de TESTE:")
     print(f"  AUC-ROC    : {test_metrics['auc_roc']:.4f}")
     print(f"  AUC-PR     : {test_metrics['auc_pr']:.4f}")
