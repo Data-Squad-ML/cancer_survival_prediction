@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 
-"""Treina XGBoost Survival (Cox) com Grid Search, KFold, GPU automatica e metricas avancadas."""
+"""Treina XGBoost Survival (Cox) com Grid Search, KFold, GPU automatica e metricas avancadas.
+
+Metricas adicionais incluidas (alem das originais):
+  - Curvas de Kaplan-Meier por tercis de risco + log-rank test
+  - KS de sobrevivência entre grupos de alto e baixo risco
+  - Calibracao por decil (E/O ratio — analogo ao Lift/Ganho de classificacao)
+  - D de Royston (poder discriminativo em escala de log-risco)
+  - Distribuicao dos log-riscos por status de evento
+  - Net Benefit simplificado (Decision Curve Analysis)
+  - C-index por subgrupo (sexo, faixa etaria se disponiveis)
+  - Brier score por tempo exportado como CSV
+  - CSVs de curvas de sobrevivencia e calibracao para plotagem externa
+"""
 
 from __future__ import annotations
 
@@ -10,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy import stats as scipy_stats
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.impute import SimpleImputer
 from sklearn.inspection import permutation_importance
@@ -68,6 +81,10 @@ OHE_PREFIXES = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Utilitarios gerais
+# ---------------------------------------------------------------------------
+
 def default_data_path(filename: str) -> Path:
     return Path(__file__).resolve().parent / filename
 
@@ -89,6 +106,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("results/xgboost_survival_gpu_results.txt"),
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("results"),
+        help="Diretorio para CSVs auxiliares de curvas e calibracao.",
+    )
     parser.add_argument("--cv", type=int, default=5)
     parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--xgb-n-jobs", type=int, default=1)
@@ -104,17 +127,8 @@ def parse_args() -> argparse.Namespace:
         type=str,
         choices=["ipcw", "class_weight", "none"],
         default="ipcw",
-        help=(
-            "Peso de amostras. 'ipcw' usa pesos por censura (recomendado para survival), "
-            "'class_weight' usa a coluna class_weight, 'none' desativa pesos."
-        ),
     )
-    parser.add_argument(
-        "--ipcw-min-prob",
-        type=float,
-        default=1e-3,
-        help="Limite minimo para G_hat(t) no IPCW para evitar pesos extremos.",
-    )
+    parser.add_argument("--ipcw-min-prob", type=float, default=1e-3)
     parser.add_argument(
         "--shap-csv",
         type=Path,
@@ -131,6 +145,13 @@ def parse_args() -> argparse.Namespace:
         default=Path("results/xgboost_survival_shap_beeswarm.png"),
     )
     parser.add_argument("--shap-max-samples", type=int, default=5000)
+    # Coluna de subgrupo opcional para C-index estratificado
+    parser.add_argument(
+        "--subgroup-col",
+        type=str,
+        default="sexo",
+        help="Coluna categorica para calculo de C-index por subgrupo.",
+    )
     return parser.parse_args()
 
 
@@ -140,10 +161,8 @@ def build_feature_columns(train_df: pd.DataFrame, test_df: pd.DataFrame) -> list
     ]
     selected = [col for col in (FEATURE_COLS_BASE + feature_cols_ohe) if col in train_df.columns]
     selected = [col for col in selected if col in test_df.columns]
-
     if not selected:
         raise ValueError("Nenhuma feature selecionada foi encontrada nos dados de treino/teste.")
-
     return selected
 
 
@@ -155,6 +174,7 @@ def build_survival_targets(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     event = (df[target].astype(int) == 0).to_numpy(dtype=bool)
     time = np.where(event, df[event_time_col].to_numpy(), df[time_col].to_numpy()).astype(float)
+    time = np.clip(time, 1e-6, None)
     y_surv = Surv.from_arrays(event=event, time=time)
     return y_surv, event, time
 
@@ -166,11 +186,9 @@ def build_xgb_label(time: np.ndarray, event: np.ndarray) -> np.ndarray:
 
 
 def compute_ipcw_weights(y_surv, min_prob: float = 1e-3) -> np.ndarray:
-    """Calcula pesos IPCW com base na distribuicao de censura do treino."""
     event = np.asarray(y_surv["event"]).astype(bool)
     time = np.asarray(y_surv["time"]).astype(float)
     censor_event = ~event
-
     _, g_hat = kaplan_meier_estimator(censor_event, time)
     g_hat = np.interp(time, _, g_hat, left=g_hat[0], right=g_hat[-1])
     g_hat = np.clip(g_hat, min_prob, 1.0)
@@ -220,8 +238,18 @@ def load_split_data(
         y_test_xgb,
         w_class,
         feature_cols,
+        train_df,
+        test_df,
+        event_train,
+        time_train,
+        event_test,
+        time_test,
     )
 
+
+# ---------------------------------------------------------------------------
+# Modelo e treinamento
+# ---------------------------------------------------------------------------
 
 def make_xgb_model(random_state: int, xgb_n_jobs: int, mode: str) -> XGBRegressor:
     params = {
@@ -232,24 +260,17 @@ def make_xgb_model(random_state: int, xgb_n_jobs: int, mode: str) -> XGBRegresso
         "n_jobs": xgb_n_jobs,
         "max_delta_step": 1,
     }
-
     if mode == "gpu_hist":
         params.update({"tree_method": "gpu_hist", "predictor": "gpu_predictor"})
     elif mode == "cuda_hist":
         params.update({"tree_method": "hist", "device": "cuda", "predictor": "auto"})
     else:
         params.update({"tree_method": "hist", "predictor": "auto"})
-
     return XGBRegressor(**params)
 
 
 class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
-    """Wrapper para permitir y estruturado de survival no GridSearchCV.
-
-    O XGBoost survival:cox espera rótulo numérico com tempo positivo para evento
-    e tempo negativo para censura. Este wrapper faz essa conversão internamente,
-    preservando a API do scikit-learn para CV/scoring com y estruturado.
-    """
+    """Wrapper para permitir y estruturado de survival no GridSearchCV."""
 
     def __init__(
         self,
@@ -358,7 +379,6 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
             try:
                 self.model_.fit(X_tr, y_tr, **fit_kwargs_train, **es_kwargs)
             except TypeError as exc:
-                # Versoes antigas do XGBoost nao aceitam alguns kwargs do early stopping.
                 msg = str(exc)
                 if any(
                     key in msg
@@ -382,7 +402,7 @@ class XGBSurvivalCoxEstimator(BaseEstimator, RegressorMixin):
 def select_xgb_mode(
     x_train: pd.DataFrame,
     y_train_xgb: np.ndarray,
-    w_train: pd.Series | None,
+    w_train,
     random_state: int,
     xgb_n_jobs: int,
     force_cpu: bool,
@@ -393,12 +413,12 @@ def select_xgb_mode(
     sample_size = min(2048, len(x_train))
     x_sample = x_train.iloc[:sample_size]
     y_sample = y_train_xgb[:sample_size].astype(np.float32)
-    if w_train is None:
-        w_sample = None
-    elif hasattr(w_train, "iloc"):
-        w_sample = w_train.iloc[:sample_size]
-    else:
-        w_sample = np.asarray(w_train)[:sample_size]
+    w_sample = None
+    if w_train is not None:
+        if hasattr(w_train, "iloc"):
+            w_sample = w_train.iloc[:sample_size]
+        else:
+            w_sample = np.asarray(w_train)[:sample_size]
 
     for mode in ["cuda_hist", "gpu_hist"]:
         try:
@@ -415,7 +435,6 @@ def select_xgb_mode(
 def rsf_like_cindex_scorer(estimator, x, y_surv) -> float:
     risk = estimator.predict(x)
     risk = np.clip(risk, -1e6, 1e6)
-
     return float(concordance_index_censored(y_surv["event"], y_surv["time"], risk)[0])
 
 
@@ -430,7 +449,7 @@ def run_training(
     x_train: pd.DataFrame,
     event_train: np.ndarray,
     y_train_surv,
-    w_train: pd.Series | None,
+    w_train,
     cv: int,
     n_jobs: int,
     xgb_n_jobs: int,
@@ -484,31 +503,22 @@ def run_training(
         "model__reg_lambda": [1.0, 3.0],
     }
 
-    # Survival com evento raro pode gerar folds sem eventos com KFold comum.
-    # Isso distorce C-index/seleciona hiperparametros instaveis.
-    # Por isso, estratificamos pelo indicador de evento e validamos um minimo
-    # de eventos por fold de validacao.
     event_train = np.asarray(event_train).astype(int)
     n_events = int(event_train.sum())
     n_samples = int(len(event_train))
 
     if n_events < cv:
         raise ValueError(
-            "Numero de eventos insuficiente para StratifiedKFold: "
-            f"eventos={n_events}, cv={cv}. Reduza cv ou aumente dados com evento."
+            f"Numero de eventos insuficiente para StratifiedKFold: eventos={n_events}, cv={cv}."
         )
-
     if n_events < cv * min_events_per_fold:
         raise ValueError(
-            "Distribuicao de eventos insuficiente para o minimo por fold: "
-            f"eventos={n_events}, cv={cv}, min_events_per_fold={min_events_per_fold}. "
-            "Reduza cv/min_events_per_fold ou reavalie o split treino/teste."
+            f"Distribuicao de eventos insuficiente: eventos={n_events}, cv={cv}, "
+            f"min_events_per_fold={min_events_per_fold}."
         )
-
     if (n_samples - n_events) < cv:
         raise ValueError(
-            "Numero de censurados insuficiente para StratifiedKFold: "
-            f"censurados={n_samples - n_events}, cv={cv}."
+            f"Numero de censurados insuficiente: censurados={n_samples - n_events}, cv={cv}."
         )
 
     cv_strategy = StratifiedKFold(n_splits=cv, shuffle=True, random_state=random_state)
@@ -517,9 +527,8 @@ def run_training(
     min_events_found = min(int(event_train[val_idx].sum()) for _, val_idx in cv_splits)
     if min_events_found < min_events_per_fold:
         raise ValueError(
-            "Fold de validacao com poucos eventos apos estratificacao: "
-            f"min_encontrado={min_events_found}, minimo_exigido={min_events_per_fold}. "
-            "Ajuste cv/min_events_per_fold."
+            f"Fold de validacao com poucos eventos: min_encontrado={min_events_found}, "
+            f"minimo_exigido={min_events_per_fold}."
         )
 
     grid_search = GridSearchCV(
@@ -536,6 +545,10 @@ def run_training(
     grid_search.fit(x_train, y_train_surv, **fit_params)
     return grid_search, xgb_mode
 
+
+# ---------------------------------------------------------------------------
+# Metricas de survival (originais)
+# ---------------------------------------------------------------------------
 
 def build_eval_times(
     y_train_surv,
@@ -592,13 +605,8 @@ def compute_survival_metrics(
     )
     uno_cindex_test = float(concordance_index_ipcw(y_train_surv, y_test_surv, risk_test)[0])
 
-    auc_by_time, mean_auc = cumulative_dynamic_auc(
-        y_train_surv,
-        y_test_surv,
-        risk_test,
-        eval_times,
-    )
-
+    # Breslow para funcao de sobrevivencia — determina o dominio valido primeiro,
+    # para garantir que AUC, Brier e survival_test usem EXATAMENTE os mesmos tempos.
     breslow = BreslowEstimator().fit(
         y_train_surv["event"],
         y_train_surv["time"],
@@ -607,17 +615,23 @@ def compute_survival_metrics(
     survival_functions_test = breslow.get_survival_function(risk_test)
     domain_min, domain_max = survival_functions_test[0].domain
     eps = max((domain_max - domain_min) * 1e-3, 1e-9)
+
+    # clipped_times: subconjunto de eval_times dentro do dominio Breslow.
+    # Todas as metricas (AUC, Brier, survival) usam este unico vetor.
     clipped_times = eval_times[(eval_times > domain_min + eps) & (eval_times < domain_max - eps)]
     if len(clipped_times) < 3:
         clipped_times = np.linspace(domain_min + eps, domain_max - eps, num=5)
 
+    auc_by_time, mean_auc = cumulative_dynamic_auc(
+        y_train_surv, y_test_surv, risk_test, clipped_times
+    )
+
+    # survival_prob_test: shape (n_test, n_clipped_times)
     survival_prob_test = np.vstack([fn(clipped_times) for fn in survival_functions_test])
 
     _, brier_scores = brier_score(y_train_surv, y_test_surv, survival_prob_test, clipped_times)
     mean_brier = float(np.mean(brier_scores))
-    ibs = float(
-        integrated_brier_score(y_train_surv, y_test_surv, survival_prob_test, clipped_times)
-    )
+    ibs = float(integrated_brier_score(y_train_surv, y_test_surv, survival_prob_test, clipped_times))
 
     return {
         "cindex_train": cindex_train,
@@ -625,10 +639,14 @@ def compute_survival_metrics(
         "cindex_gap": cindex_train - cindex_test,
         "uno_cindex_test": uno_cindex_test,
         "mean_dynamic_auc": float(mean_auc),
-        "dynamic_auc_by_time": auc_by_time,
+        "dynamic_auc_by_time": auc_by_time,   # len == len(clipped_times)
         "mean_brier": mean_brier,
         "ibs": ibs,
-        "eval_times": clipped_times,
+        "eval_times": clipped_times,           # unica fonte de verdade para os tempos
+        "survival_test": survival_prob_test,   # shape (n_test, len(clipped_times))
+        "brier_by_time": brier_scores,         # len == len(clipped_times)
+        "risk_train": risk_train,
+        "risk_test": risk_test,
     }
 
 
@@ -686,7 +704,6 @@ def compute_and_save_global_shap(
 ) -> pd.DataFrame:
     try:
         import matplotlib
-
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
         import shap
@@ -703,7 +720,6 @@ def compute_and_save_global_shap(
     wrapped_model = best_model.named_steps["model"]
     xgb_model = wrapped_model.model_
 
-    # SHAP no XGBoost deve usar a mesma representacao de entrada usada no treino.
     sample_size = min(len(x_test), int(shap_max_samples))
     x_sample = x_test.iloc[:sample_size].copy()
     x_imputed = imputer.transform(x_sample)
@@ -713,38 +729,28 @@ def compute_and_save_global_shap(
     shap_values = explainer.shap_values(x_imputed_df)
 
     if isinstance(shap_values, list):
-        # Para manter compatibilidade com diferentes versoes do SHAP.
         shap_values = shap_values[0]
 
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
     shap_global_df = (
-        pd.DataFrame(
-            {
-                "feature": x_test.columns,
-                "mean_abs_shap": mean_abs_shap,
-            }
-        )
+        pd.DataFrame({"feature": x_test.columns, "mean_abs_shap": mean_abs_shap})
         .sort_values("mean_abs_shap", ascending=False)
         .reset_index(drop=True)
     )
     shap_global_df.to_csv(shap_csv_path, index=False)
 
     shap.summary_plot(
-        shap_values,
-        features=x_imputed_df,
-        feature_names=list(x_test.columns),
-        plot_type="bar",
-        show=False,
+        shap_values, features=x_imputed_df,
+        feature_names=list(x_test.columns), plot_type="bar", show=False,
     )
+    import matplotlib.pyplot as plt
     plt.tight_layout()
     plt.savefig(shap_plot_path, dpi=200, bbox_inches="tight")
     plt.close()
 
     shap.summary_plot(
-        shap_values,
-        features=x_imputed_df,
-        feature_names=list(x_test.columns),
-        show=False,
+        shap_values, features=x_imputed_df,
+        feature_names=list(x_test.columns), show=False,
     )
     plt.tight_layout()
     plt.savefig(shap_beeswarm_plot_path, dpi=200, bbox_inches="tight")
@@ -753,8 +759,390 @@ def compute_and_save_global_shap(
     return shap_global_df
 
 
+# ===========================================================================
+# METRICAS ADICIONAIS (identicas as do DeepSurv, sem dependencia de PyTorch)
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# 1. Kaplan-Meier por grupos de risco + log-rank test
+# ---------------------------------------------------------------------------
+
+def logrank_test_two_groups(
+    time_a: np.ndarray, event_a: np.ndarray,
+    time_b: np.ndarray, event_b: np.ndarray,
+) -> tuple[float, float]:
+    """Log-rank test manual (Mantel-Cox) entre dois grupos."""
+    all_times = np.unique(np.concatenate([time_a[event_a], time_b[event_b]]))
+    O_a_total, E_a_total, V_total = 0.0, 0.0, 0.0
+
+    for t in all_times:
+        n_a = np.sum(time_a >= t)
+        n_b = np.sum(time_b >= t)
+        n = n_a + n_b
+        if n == 0:
+            continue
+        d_a = np.sum((time_a == t) & event_a)
+        d_b = np.sum((time_b == t) & event_b)
+        d = d_a + d_b
+        e_a = d * n_a / n
+        O_a_total += d_a
+        E_a_total += e_a
+        if n > 1:
+            V_total += d * n_a * n_b * (n - d) / (n**2 * (n - 1))
+
+    if V_total < 1e-10:
+        return 0.0, 1.0
+
+    chi2 = (O_a_total - E_a_total) ** 2 / V_total
+    p_val = float(scipy_stats.chi2.sf(chi2, df=1))
+    return float(chi2), p_val
+
+
+def km_curve(time: np.ndarray, event: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Kaplan-Meier simples. Retorna (times, survival_probs)."""
+    order = np.argsort(time)
+    t_s, e_s = time[order], event[order]
+    s = 1.0
+    times_out, surv_out = [0.0], [1.0]
+    for t in np.unique(t_s):
+        d = np.sum((t_s == t) & e_s)
+        at_risk = np.sum(t_s >= t)
+        if at_risk > 0:
+            s *= (1 - d / at_risk)
+        times_out.append(float(t))
+        surv_out.append(float(s))
+    return np.array(times_out), np.array(surv_out)
+
+
+def compute_km_risk_groups(
+    log_risk: np.ndarray,
+    time: np.ndarray,
+    event: np.ndarray,
+    n_groups: int = 3,
+) -> dict:
+    """Divide amostras em n_groups por quantil de log-risco e calcula KM + log-rank."""
+    thresholds = np.quantile(log_risk, np.linspace(0, 1, n_groups + 1))
+    labels = np.digitize(log_risk, thresholds[1:-1])
+
+    group_labels = (
+        ["Baixo Risco", "Risco Intermediario", "Alto Risco"]
+        if n_groups == 3
+        else [f"Grupo {i+1}" for i in range(n_groups)]
+    )
+
+    km_results = {}
+    for g in range(n_groups):
+        mask = labels == g
+        if mask.sum() < 5:
+            continue
+        t_km, s_km = km_curve(time[mask], event[mask])
+        km_results[group_labels[g]] = {
+            "times": t_km,
+            "survival": s_km,
+            "n": int(mask.sum()),
+            "n_events": int(event[mask].sum()),
+        }
+
+    mask_low = labels == 0
+    mask_high = labels == (n_groups - 1)
+    chi2, p_val = logrank_test_two_groups(
+        time[mask_low], event[mask_low],
+        time[mask_high], event[mask_high],
+    )
+
+    return {
+        "groups": km_results,
+        "logrank_chi2_low_vs_high": chi2,
+        "logrank_pval_low_vs_high": p_val,
+        "n_groups": n_groups,
+    }
+
+
+# ---------------------------------------------------------------------------
+# 2. KS de sobrevivência
+# ---------------------------------------------------------------------------
+
+def compute_survival_ks(
+    log_risk: np.ndarray,
+    event: np.ndarray,
+) -> dict:
+    """KS entre a distribuicao de log-risco de eventos vs. censurados."""
+    risk_event = np.sort(log_risk[event.astype(bool)])
+    risk_censor = np.sort(log_risk[~event.astype(bool)])
+    ks_stat, ks_pval = scipy_stats.ks_2samp(risk_event, risk_censor)
+
+    n = len(log_risk)
+    order = np.argsort(log_risk)[::-1]
+    sorted_event = event[order].astype(float)
+    total_events = event.sum()
+    total_censored = (~event.astype(bool)).sum()
+
+    decil_rows = []
+    cumulative_events, cumulative_censored = 0.0, 0.0
+    best_ks, best_decil = 0.0, 0
+
+    for d in range(1, 11):
+        idx_end = int(n * d / 10)
+        idx_start = int(n * (d - 1) / 10)
+        batch = sorted_event[idx_start:idx_end]
+        cumulative_events += batch.sum()
+        cumulative_censored += (1 - batch).sum()
+
+        pct_events = cumulative_events / max(total_events, 1)
+        pct_censored = cumulative_censored / max(total_censored, 1)
+        ks_d = abs(pct_events - pct_censored)
+
+        if ks_d > best_ks:
+            best_ks = ks_d
+            best_decil = d
+
+        decil_rows.append({
+            "decil": d,
+            "pct_base": f"{d*10}%",
+            "cum_pct_eventos": round(pct_events, 4),
+            "cum_pct_censurados": round(pct_censored, 4),
+            "ks_decil": round(ks_d, 4),
+        })
+
+    return {
+        "ks_stat": float(ks_stat),
+        "ks_pval": float(ks_pval),
+        "ks_best_decil": best_decil,
+        "ks_best_value": float(best_ks),
+        "ks_by_decil": pd.DataFrame(decil_rows),
+    }
+
+
+# ---------------------------------------------------------------------------
+# 3. Calibracao por decil de risco (E/O ratio)
+# ---------------------------------------------------------------------------
+
+def compute_calibration_by_decil(
+    log_risk: np.ndarray,
+    time: np.ndarray,
+    event: np.ndarray,
+    survival_at_t: np.ndarray,
+    eval_time: float,
+    n_decils: int = 10,
+) -> pd.DataFrame:
+    """Para um tempo de referencia eval_time, calcula E/O por decil de risco."""
+    order = np.argsort(log_risk)
+    n = len(log_risk)
+    rows = []
+
+    for d in range(n_decils):
+        idx_start = int(n * d / n_decils)
+        idx_end = int(n * (d + 1) / n_decils)
+        idx = order[idx_start:idx_end]
+
+        expected_surv = float(np.mean(survival_at_t[idx]))
+        expected_event_rate = 1.0 - expected_surv
+
+        t_dec, e_dec = time[idx], event[idx]
+        km_t, km_s = km_curve(t_dec, e_dec)
+        obs_surv = float(np.interp(eval_time, km_t, km_s))
+        obs_event_rate = 1.0 - obs_surv
+
+        eo_ratio = obs_event_rate / max(expected_event_rate, 1e-8)
+
+        rows.append({
+            "decil": d + 1,
+            "n": len(idx),
+            "sobrev_esperada_modelo": round(expected_surv, 4),
+            "taxa_evento_esperada": round(expected_event_rate, 4),
+            "sobrev_observada_km": round(obs_surv, 4),
+            "taxa_evento_observada": round(obs_event_rate, 4),
+            "razao_E_O": round(eo_ratio, 4),
+        })
+
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# 4. D de Royston
+# ---------------------------------------------------------------------------
+
+def compute_royston_d(
+    log_risk: np.ndarray,
+    event: np.ndarray,
+) -> dict:
+    """D de Royston-Sauerbrei como medida de discriminacao."""
+    n = len(log_risk)
+    ranks = scipy_stats.rankdata(log_risk) / (n + 1)
+    ranks = np.clip(ranks, 1e-6, 1 - 1e-6)
+    z = scipy_stats.norm.ppf(ranks)
+
+    z_events = z[event.astype(bool)]
+    if len(z_events) < 5:
+        return {"D_royston": np.nan, "R2_royston": np.nan}
+
+    D = float(np.std(z_events, ddof=1) * np.sqrt(8.0 / np.pi))
+    R2 = D**2 / (D**2 + (np.pi**2 / 6))
+    return {"D_royston": round(D, 6), "R2_royston": round(R2, 6)}
+
+
+# ---------------------------------------------------------------------------
+# 5. Distribuicao dos log-riscos por status de evento
+# ---------------------------------------------------------------------------
+
+def compute_risk_score_distribution(
+    log_risk: np.ndarray,
+    event: np.ndarray,
+    n_bins: int = 10,
+) -> dict:
+    """Estatisticas descritivas dos log-riscos separados por status."""
+    risk_ev = log_risk[event.astype(bool)]
+    risk_cen = log_risk[~event.astype(bool)]
+
+    def summary(arr: np.ndarray, label: str) -> dict:
+        return {
+            "grupo": label,
+            "n": len(arr),
+            "media": round(float(np.mean(arr)), 4),
+            "mediana": round(float(np.median(arr)), 4),
+            "std": round(float(np.std(arr)), 4),
+            "p10": round(float(np.percentile(arr, 10)), 4),
+            "p25": round(float(np.percentile(arr, 25)), 4),
+            "p75": round(float(np.percentile(arr, 75)), 4),
+            "p90": round(float(np.percentile(arr, 90)), 4),
+            "min": round(float(np.min(arr)), 4),
+            "max": round(float(np.max(arr)), 4),
+        }
+
+    stats_df = pd.DataFrame([
+        summary(risk_ev, "Evento (obito)"),
+        summary(risk_cen, "Censurado (vivo)"),
+    ])
+
+    all_bins = np.linspace(log_risk.min(), log_risk.max(), n_bins + 1)
+    hist_rows = []
+    for i in range(n_bins):
+        lo, hi = all_bins[i], all_bins[i + 1]
+        mask = (log_risk >= lo) & (log_risk < hi if i < n_bins - 1 else log_risk <= hi)
+        hist_rows.append({
+            "bin_inicio": round(lo, 4),
+            "bin_fim": round(hi, 4),
+            "n_evento": int(event[mask].sum()),
+            "n_censurado": int((~event.astype(bool))[mask].sum()),
+        })
+
+    return {
+        "stats_df": stats_df,
+        "hist_df": pd.DataFrame(hist_rows),
+    }
+
+
+# ---------------------------------------------------------------------------
+# 6. Net Benefit simplificado (Decision Curve Analysis)
+# ---------------------------------------------------------------------------
+
+def compute_net_benefit(
+    log_risk: np.ndarray,
+    event: np.ndarray,
+    time: np.ndarray,
+    eval_time: float,
+    survival_at_t: np.ndarray,
+    n_thresholds: int = 20,
+) -> pd.DataFrame:
+    """Decision Curve Analysis simplificada para survival."""
+    n = len(log_risk)
+    prob_event = 1.0 - survival_at_t
+    obs_event = (event.astype(bool) & (time <= eval_time)).astype(float)
+
+    thresholds = np.linspace(0.01, 0.99, n_thresholds)
+    rows = []
+    for pt in thresholds:
+        predicted_pos = prob_event >= pt
+        tp = float(np.sum(predicted_pos & obs_event.astype(bool)))
+        fp = float(np.sum(predicted_pos & ~obs_event.astype(bool)))
+        nb = (tp / n) - (fp / n) * (pt / max(1 - pt, 1e-8))
+
+        all_tp = float(obs_event.sum())
+        all_fp = float((1 - obs_event).sum())
+        nb_all = (all_tp / n) - (all_fp / n) * (pt / max(1 - pt, 1e-8))
+
+        rows.append({
+            "threshold_pt": round(float(pt), 3),
+            "net_benefit_modelo": round(float(nb), 6),
+            "net_benefit_tratar_todos": round(float(nb_all), 6),
+            "net_benefit_nao_tratar": 0.0,
+        })
+
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# 7. C-index por subgrupo
+# ---------------------------------------------------------------------------
+
+def compute_cindex_by_subgroup(
+    log_risk: np.ndarray,
+    y_train_surv,
+    y_test_surv,
+    event_test: np.ndarray,
+    time_test: np.ndarray,
+    subgroup_series: pd.Series | None,
+) -> pd.DataFrame:
+    """Calcula o Uno C-index para cada subgrupo de uma variavel categorica."""
+    if subgroup_series is None or len(subgroup_series) == 0:
+        return pd.DataFrame()
+
+    rows = []
+    for val in sorted(subgroup_series.unique()):
+        mask = (subgroup_series == val).to_numpy()
+        if mask.sum() < 10 or int(event_test[mask].sum()) < 3:
+            continue
+
+        lr_sub = log_risk[mask]
+        y_sub = Surv.from_arrays(event=event_test[mask].astype(bool), time=time_test[mask])
+
+        try:
+            ci = float(concordance_index_ipcw(y_train_surv, y_sub, lr_sub)[0])
+        except Exception:
+            ci = float(
+                concordance_index_censored(
+                    event_test[mask].astype(bool), time_test[mask], lr_sub
+                )[0]
+            )
+
+        rows.append({
+            "subgrupo": val,
+            "n": int(mask.sum()),
+            "n_eventos": int(event_test[mask].sum()),
+            "uno_cindex": round(ci, 6),
+        })
+
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# Utilitarios de exportacao de curvas para CSV
+# ---------------------------------------------------------------------------
+
+def km_groups_to_csv(km_result: dict, output_dir: Path, prefix: str = "km") -> None:
+    rows = []
+    for group_name, gdata in km_result["groups"].items():
+        for t, s in zip(gdata["times"], gdata["survival"]):
+            rows.append({"grupo": group_name, "tempo": round(float(t), 4), "sobrevivencia": round(float(s), 4)})
+    out = output_dir / f"{prefix}_curvas_km.csv"
+    pd.DataFrame(rows).to_csv(out, index=False)
+    print(f"  [CSV] Curvas KM salvas em: {out}")
+
+
+def brier_by_time_to_csv(eval_times: np.ndarray, brier_by_time: np.ndarray, output_dir: Path) -> None:
+    df = pd.DataFrame({"tempo": np.round(eval_times, 4), "brier_score": np.round(brier_by_time, 6)})
+    out = output_dir / "brier_score_por_tempo.csv"
+    df.to_csv(out, index=False)
+    print(f"  [CSV] Brier por tempo salvo em: {out}")
+
+
+# ===========================================================================
+# Salvar resultados (expandido)
+# ===========================================================================
+
 def save_results(
     output_path: Path,
+    output_dir: Path,
     target: str,
     train_size: int,
     test_size: int,
@@ -775,20 +1163,40 @@ def save_results(
     shap_csv_path: Path,
     shap_plot_path: Path,
     shap_beeswarm_plot_path: Path,
+    # Metricas adicionais
+    km_result: dict,
+    ks_result: dict,
+    calib_df: pd.DataFrame,
+    calib_eval_time: float,
+    royston: dict,
+    risk_dist: dict,
+    net_benefit_df: pd.DataFrame,
+    subgroup_df: pd.DataFrame,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     best_idx = grid_search.best_index_
     best_std = float(grid_search.cv_results_["std_test_score"][best_idx])
     eval_times = metrics["eval_times"]
     auc_by_time = metrics["dynamic_auc_by_time"]
+    brier_by_time = metrics["brier_by_time"]
 
-    auc_time_df = pd.DataFrame(
-        {
-            "tempo": np.round(eval_times, 4),
-            "auc_dinamica": np.round(auc_by_time, 6),
-        }
-    )
+    auc_time_df = pd.DataFrame({
+        "tempo": np.round(eval_times, 4),
+        "auc_dinamica": np.round(auc_by_time, 6),
+        "brier_score": np.round(brier_by_time, 6),
+    })
+
+    # Exporta CSVs auxiliares
+    km_groups_to_csv(km_result, output_dir, prefix="test")
+    brier_by_time_to_csv(eval_times, brier_by_time, output_dir)
+    ks_result["ks_by_decil"].to_csv(output_dir / "ks_por_decil.csv", index=False)
+    calib_df.to_csv(output_dir / "calibracao_por_decil.csv", index=False)
+    net_benefit_df.to_csv(output_dir / "net_benefit_dca.csv", index=False)
+    risk_dist["hist_df"].to_csv(output_dir / "distribuicao_log_risco.csv", index=False)
+    if not subgroup_df.empty:
+        subgroup_df.to_csv(output_dir / "cindex_por_subgrupo.csv", index=False)
 
     report_lines = [
         "=" * 70,
@@ -815,25 +1223,106 @@ def save_results(
         f"Desvio padrao do melhor score: {best_std:.6f}",
         f"Melhores hiperparametros: {grid_search.best_params_}",
         "",
-        "--- Metricas de Qualidade (treino/teste) ---",
-        f"C-index treino       : {metrics['cindex_train']:.6f}",
-        f"C-index teste        : {metrics['cindex_test']:.6f}",
-        f"Gap C-index          : {metrics['cindex_gap']:.6f}",
-        f"Uno C-index teste    : {metrics['uno_cindex_test']:.6f}",
-        f"AUC dinamica media   : {metrics['mean_dynamic_auc']:.6f}",
-        f"Brier medio          : {metrics['mean_brier']:.6f}",
-        f"Integrated Brier (IBS): {metrics['ibs']:.6f}",
+        "=" * 70,
+        "METRICAS DE DISCRIMINACAO",
+        "=" * 70,
+        f"C-index treino            : {metrics['cindex_train']:.6f}",
+        f"C-index teste             : {metrics['cindex_test']:.6f}",
+        f"Gap C-index (overfit)     : {metrics['cindex_gap']:.6f}",
+        f"Uno C-index teste (IPCW)  : {metrics['uno_cindex_test']:.6f}",
+        f"AUC dinamica media        : {metrics['mean_dynamic_auc']:.6f}",
         "",
-        "--- AUC Dinamica por Tempo ---",
+        "[D de Royston]",
+        f"  D de Royston            : {royston['D_royston']}",
+        f"  R2 de Royston           : {royston['R2_royston']}",
+        "  (D > 1 = discriminacao razoavel; D > 2 = excelente)",
+        "",
+        "=" * 70,
+        "METRICAS DE CALIBRACAO",
+        "=" * 70,
+        f"Brier score medio         : {metrics['mean_brier']:.6f}",
+        f"Integrated Brier (IBS)    : {metrics['ibs']:.6f}",
+        "  (IBS < 0.25 e considerado bom; IBS = 0.25 equivale ao modelo nulo)",
+        "",
+        f"[Calibracao por decil de risco — tempo de referencia: {calib_eval_time:.1f}]",
+        "(Decil 1 = menor risco, Decil 10 = maior risco)",
+        "(Razao E/O: 1.0 = calibracao perfeita; > 1 = subestima evento; < 1 = superestima)",
+        calib_df.to_string(index=False),
+        "",
+        "=" * 70,
+        "KS DE SOBREVIVENCIA (separacao entre grupos Evento vs. Censurado)",
+        "=" * 70,
+        f"KS estatistico (2-amostras): {ks_result['ks_stat']:.6f}",
+        f"KS p-valor                 : {ks_result['ks_pval']:.6e}",
+        f"KS maximo no decil         : {ks_result['ks_best_decil']} (KS = {ks_result['ks_best_value']:.6f})",
+        "",
+        "[KS por Decil de Risco — log-risco decrescente]",
+        "(Analoga a tabela de KS / Ganho / Lift de classificacao)",
+        ks_result["ks_by_decil"].to_string(index=False),
+        "",
+        "=" * 70,
+        "CURVAS DE KAPLAN-MEIER POR GRUPO DE RISCO",
+        "=" * 70,
+        f"Log-rank test (baixo vs alto risco): chi2 = {km_result['logrank_chi2_low_vs_high']:.4f}, "
+        f"p = {km_result['logrank_pval_low_vs_high']:.6e}",
+        "",
+    ]
+
+    for gname, gdata in km_result["groups"].items():
+        report_lines.append(
+            f"  {gname}: n={gdata['n']}, eventos={gdata['n_events']}, "
+            f"S(max_t) = {gdata['survival'][-1]:.4f}"
+        )
+
+    report_lines += [
+        "(Curvas completas exportadas para: results/test_curvas_km.csv)",
+        "",
+        "=" * 70,
+        "DISTRIBUICAO DOS LOG-RISCOS POR STATUS",
+        "=" * 70,
+        risk_dist["stats_df"].to_string(index=False),
+        "",
+        "=" * 70,
+        "NET BENEFIT — DECISION CURVE ANALYSIS (simplificada)",
+        "=" * 70,
+        f"(Baseada no tempo de referencia: {calib_eval_time:.1f})",
+        "(Arquivo completo: results/net_benefit_dca.csv)",
+        net_benefit_df[
+            net_benefit_df["threshold_pt"].isin(
+                net_benefit_df["threshold_pt"].quantile(np.linspace(0, 1, 10)).values
+            )
+        ].to_string(index=False),
+        "",
+        "=" * 70,
+        "AUC DINAMICA E BRIER POR TEMPO",
+        "=" * 70,
         auc_time_df.to_string(index=False),
         "",
-        "--- Top 20 Feature Importance (gain do XGBoost) ---",
+    ]
+
+    if not subgroup_df.empty:
+        report_lines += [
+            "=" * 70,
+            "C-INDEX POR SUBGRUPO",
+            "=" * 70,
+            subgroup_df.to_string(index=False),
+            "",
+        ]
+
+    report_lines += [
+        "=" * 70,
+        "TOP 20 FEATURE IMPORTANCE (gain do XGBoost)",
+        "=" * 70,
         xgb_gain_df.head(20).to_string(index=False),
         "",
-        "--- Top 20 Permutation Importance (C-index no teste) ---",
+        "=" * 70,
+        "TOP 20 PERMUTATION IMPORTANCE (C-index no teste)",
+        "=" * 70,
         perm_df.head(20).to_string(index=False),
         "",
-        "--- Top 20 SHAP Global (mean(|SHAP|)) ---",
+        "=" * 70,
+        "TOP 20 SHAP GLOBAL (mean(|SHAP|))",
+        "=" * 70,
         shap_global_df.head(20).to_string(index=False),
         "",
         f"SHAP global CSV: {shap_csv_path}",
@@ -843,7 +1332,12 @@ def save_results(
     ]
 
     output_path.write_text("\n".join(report_lines), encoding="utf-8")
+    print(f"\nRelatorio salvo em: {output_path}")
 
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 def main() -> None:
     args = parse_args()
@@ -857,6 +1351,12 @@ def main() -> None:
         _,
         w_class,
         feature_cols,
+        train_df,
+        test_df,
+        event_train,
+        time_train,
+        event_test,
+        time_test,
     ) = load_split_data(
         train_path=args.train_path,
         test_path=args.test_path,
@@ -871,7 +1371,6 @@ def main() -> None:
         w_train = w_class
         weighting_label = "class_weight"
     elif args.weighting == "ipcw":
-        # IPCW corrige vies de censura e costuma melhorar ranking (C-index).
         w_train = compute_ipcw_weights(y_train_surv, min_prob=args.ipcw_min_prob)
         weighting_label = f"ipcw(min_prob={args.ipcw_min_prob})"
 
@@ -897,6 +1396,7 @@ def main() -> None:
         min_eval_times=args.min_eval_times,
         max_eval_times=args.max_eval_times,
     )
+
     metrics = compute_survival_metrics(
         model=best_model,
         x_train=x_train,
@@ -906,6 +1406,65 @@ def main() -> None:
         eval_times=eval_times,
     )
 
+    # Recupera os risk scores gerados internamente pelo compute_survival_metrics
+    risk_test = metrics.pop("risk_test")
+    risk_train = metrics.pop("risk_train")
+
+    print("\nCalculando metricas adicionais...")
+
+    # 1. KM por grupos de risco (no conjunto de teste)
+    km_result = compute_km_risk_groups(risk_test, time_test, event_test, n_groups=3)
+    print(
+        f"  Log-rank (baixo vs alto risco): chi2={km_result['logrank_chi2_low_vs_high']:.4f}, "
+        f"p={km_result['logrank_pval_low_vs_high']:.4e}"
+    )
+
+    # 2. KS de sobrevivência
+    ks_result = compute_survival_ks(risk_test, event_test)
+    print(f"  KS estatistico: {ks_result['ks_stat']:.6f} (decil {ks_result['ks_best_decil']})")
+
+    # 3. Calibracao por decil — tempo mediano de avaliacao como referencia
+    calib_eval_time = float(np.median(metrics["eval_times"]))
+    calib_time_idx = int(np.argmin(np.abs(metrics["eval_times"] - calib_eval_time)))
+    survival_at_ref = metrics["survival_test"][:, calib_time_idx]
+    calib_df = compute_calibration_by_decil(
+        log_risk=risk_test,
+        time=time_test,
+        event=event_test,
+        survival_at_t=survival_at_ref,
+        eval_time=calib_eval_time,
+    )
+
+    # 4. D de Royston
+    royston = compute_royston_d(risk_test, event_test)
+    print(f"  D de Royston: {royston['D_royston']}, R2: {royston['R2_royston']}")
+
+    # 5. Distribuicao dos log-riscos
+    risk_dist = compute_risk_score_distribution(risk_test, event_test)
+
+    # 6. Net Benefit
+    net_benefit_df = compute_net_benefit(
+        log_risk=risk_test,
+        event=event_test,
+        time=time_test,
+        eval_time=calib_eval_time,
+        survival_at_t=survival_at_ref,
+    )
+
+    # 7. C-index por subgrupo
+    subgroup_series = None
+    if args.subgroup_col and args.subgroup_col in test_df.columns:
+        subgroup_series = test_df[args.subgroup_col].reset_index(drop=True)
+    subgroup_df = compute_cindex_by_subgroup(
+        log_risk=risk_test,
+        y_train_surv=y_train_surv,
+        y_test_surv=y_test_surv,
+        event_test=event_test,
+        time_test=time_test,
+        subgroup_series=subgroup_series,
+    )
+
+    # Importancias e SHAP
     xgb_gain_df, perm_df = compute_feature_importance_tables(
         best_model=best_model,
         x_test=x_test,
@@ -924,14 +1483,17 @@ def main() -> None:
         shap_max_samples=args.shap_max_samples,
     )
 
-    event_train = y_train_surv["event"].astype(int)
+    # Minimo de eventos por fold observado
+    event_train_int = y_train_surv["event"].astype(int)
     cv_probe = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=args.random_state)
     observed_min_events_per_fold = min(
-        int(event_train[val_idx].sum()) for _, val_idx in cv_probe.split(x_train, event_train)
+        int(event_train_int[val_idx].sum())
+        for _, val_idx in cv_probe.split(x_train, event_train_int)
     )
 
     save_results(
         output_path=args.output,
+        output_dir=args.output_dir,
         target=args.target,
         train_size=len(x_train),
         test_size=len(x_test),
@@ -952,6 +1514,14 @@ def main() -> None:
         shap_csv_path=args.shap_csv,
         shap_plot_path=args.shap_plot,
         shap_beeswarm_plot_path=args.shap_beeswarm_plot,
+        km_result=km_result,
+        ks_result=ks_result,
+        calib_df=calib_df,
+        calib_eval_time=calib_eval_time,
+        royston=royston,
+        risk_dist=risk_dist,
+        net_benefit_df=net_benefit_df,
+        subgroup_df=subgroup_df,
     )
 
     print(f"Treinamento XGBoost Survival concluido. Resultados salvos em: {args.output}")
