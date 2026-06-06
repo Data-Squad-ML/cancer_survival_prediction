@@ -1,0 +1,209 @@
+======================================================================
+ENSEMBLE HARD VOTING (VOTACAO MAJORITARIA) — RESULTADOS
+======================================================================
+Data/hora   : 2026-06-06T15:25:40
+Threshold   : 0.5   (usado nas metricas individuais)
+
+--- Modelos participantes ---
+  XGBoost
+  Random Forest
+  Deep Learning
+
+======================================================================
+ENSEMBLE (hard voting)
+======================================================================
+  Nota: AUC-ROC, AUC-PR, Brier, Log-Loss e KS/Lift nao se aplicam
+  ao hard voting pois nao ha score continuo agregado.
+  Use o ensemble_soft_voting.py para obter essas metricas.
+
+--- Metricas do Ensemble ---
+
+  [Discriminacao]
+  AUC-ROC       :      n/d  (n/d no hard voting — sem score continuo agregado)
+  AUC-PR        :      n/d
+  Gini          :      n/d
+
+  [Predicao — threshold = —]
+  Accuracy      : 0.834332
+  Precision     : 0.952675
+  Recall        : 0.853110
+  F1-Score      : 0.900148
+  MCC           : 0.445934
+
+  [Calibracao]
+  Brier Score   :      n/d  (n/d no hard voting — sem score continuo agregado)
+  Log-Loss      :      n/d
+
+  [Confusion Matrix]
+    1287     545
+    1889   10971
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.41      0.70      0.51      1832
+             1       0.95      0.85      0.90     12860
+  
+      accuracy                           0.83     14692
+     macro avg       0.68      0.78      0.71     14692
+  weighted avg       0.88      0.83      0.85     14692
+
+  [KS / Ganho / Lift]  n/d no hard voting — sem score continuo agregado
+
+======================================================================
+MODELOS INDIVIDUAIS (para comparacao)
+======================================================================
+
+--- Metricas — XGBoost ---
+
+  [Discriminacao]
+  AUC-ROC       : 0.881822
+  AUC-PR        : 0.980086
+  Gini          : 0.763645
+
+  [Predicao — threshold = 0.5]
+  Accuracy      : 0.805608
+  Precision     : 0.961950
+  Recall        : 0.809953
+  F1-Score      : 0.879433
+  MCC           : 0.439029
+
+  [Calibracao]
+  Brier Score   : 0.131668
+  Log-Loss      : 0.403448
+
+  [Confusion Matrix]
+    1420     412
+    2444   10416
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.37      0.78      0.50      1832
+             1       0.96      0.81      0.88     12860
+  
+      accuracy                           0.81     14692
+     macro avg       0.66      0.79      0.69     14692
+  weighted avg       0.89      0.81      0.83     14692
+
+  [KS / Ganho / Lift por Decil]
+  KS estatistico : 0.583373   (maximo no decil 7)
+
+  Decil   % base    Ganho     Lift
+  -----  -------  -------  -------
+      1     10%   0.1142   1.1417
+      2     20%   0.2281   1.1405
+      3     30%   0.3411   1.1368
+      4     40%   0.4534   1.1335
+      5     50%   0.5638   1.1277
+      6     60%   0.6715   1.1191
+      7     70%   0.7728   1.1039 <- KS
+      8     80%   0.8694   1.0868
+      9     90%   0.9512   1.0569
+     10    100%   1.0000   1.0000
+
+--- Metricas — Random Forest ---
+
+  [Discriminacao]
+  AUC-ROC       : 0.883741
+  AUC-PR        : 0.980773
+  Gini          : 0.767481
+
+  [Predicao — threshold = 0.5]
+  Accuracy      : 0.894705
+  Precision     : 0.914244
+  Recall        : 0.970762
+  F1-Score      : 0.941656
+  MCC           : 0.427684
+
+  [Calibracao]
+  Brier Score   : 0.078493
+  Log-Loss      : 0.262454
+
+  [Confusion Matrix]
+     661    1171
+     376   12484
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.64      0.36      0.46      1832
+             1       0.91      0.97      0.94     12860
+  
+      accuracy                           0.89     14692
+     macro avg       0.78      0.67      0.70     14692
+  weighted avg       0.88      0.89      0.88     14692
+
+  [KS / Ganho / Lift por Decil]
+  KS estatistico : 0.602082   (maximo no decil 7)
+
+  Decil   % base    Ganho     Lift
+  -----  -------  -------  -------
+      1     10%   0.1142   1.1417
+      2     20%   0.2281   1.1405
+      3     30%   0.3418   1.1391
+      4     40%   0.4544   1.1358
+      5     50%   0.5646   1.1292
+      6     60%   0.6715   1.1191
+      7     70%   0.7751   1.1072 <- KS
+      8     80%   0.8687   1.0859
+      9     90%   0.9519   1.0576
+     10    100%   1.0000   1.0000
+
+--- Metricas — Deep Learning ---
+
+  [Discriminacao]
+  AUC-ROC       : 0.864135
+  AUC-PR        : 0.976010
+  Gini          : 0.728270
+
+  [Predicao — threshold = 0.5]
+  Accuracy      : 0.790158
+  Precision     : 0.958111
+  Recall        : 0.795023
+  F1-Score      : 0.868981
+  MCC           : 0.408307
+
+  [Calibracao]
+  Brier Score   : 0.136529
+  Log-Loss      : 0.411963
+
+  [Confusion Matrix]
+    1385     447
+    2636   10224
+
+  [Classification Report]
+                precision    recall  f1-score   support
+  
+             0       0.34      0.76      0.47      1832
+             1       0.96      0.80      0.87     12860
+  
+      accuracy                           0.79     14692
+     macro avg       0.65      0.78      0.67     14692
+  weighted avg       0.88      0.79      0.82     14692
+
+  [KS / Ganho / Lift por Decil]
+  KS estatistico : 0.560300   (maximo no decil 7)
+
+  Decil   % base    Ganho     Lift
+  -----  -------  -------  -------
+      1     10%   0.1138   1.1378
+      2     20%   0.2271   1.1355
+      3     30%   0.3400   1.1331
+      4     40%   0.4515   1.1287
+      5     50%   0.5621   1.1241
+      6     60%   0.6673   1.1120
+      7     70%   0.7699   1.0998 <- KS
+      8     80%   0.8644   1.0804
+      9     90%   0.9483   1.0536
+     10    100%   1.0000   1.0000
+
+======================================================================
+TABELA COMPARATIVA
+======================================================================
+  Modelo                   AUC-ROC    AUC-PR        KS        F1       MCC     Brier
+  ----------------------  --------  --------  --------  --------  --------  --------
+  Ensemble (hard)              n/d       n/d       n/d  0.900148  0.445934       n/d
+  XGBoost                 0.881822  0.980086  0.583373  0.879433  0.439029  0.131668
+  Random Forest           0.883741  0.980773  0.602082  0.941656  0.427684  0.078493
+  Deep Learning           0.864135  0.976010  0.560300  0.868981  0.408307  0.136529
