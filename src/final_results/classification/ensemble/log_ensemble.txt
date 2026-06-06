@@ -1,0 +1,15 @@
+/home/c-ec2021/ra247248/miniconda3/envs/cancer-rf/lib/python3.12/site-packages/sklearn/metrics/_classification.py:310: UserWarning: The y_prob values do not sum to one. Make sure to pass probabilities.
+  warnings.warn(
+Modelos carregados: ['XGBoost', 'Random Forest', 'Deep Learning']
+Pesos normalizados: [0.3333, 0.3333, 0.3333]
+Shape das probabilidades: (14692, 2)
+
+Relatorio salvo em: ensemble_results.txt
+
+Resumo rapido — Ensemble vs Individuais:
+  Modelo                 AUC-ROC        KS        F1       MCC
+  --------------------  --------  --------  --------  --------
+  Ensemble                0.8842    0.5890    0.9099    0.4632
+  XGBoost                 0.8818    0.5834    0.8794    0.4390
+  Random Forest           0.8837    0.6021    0.9417    0.4277
+  Deep Learning           0.8641    0.5603    0.8690    0.4083
