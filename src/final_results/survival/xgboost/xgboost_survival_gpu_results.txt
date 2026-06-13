@@ -1,0 +1,202 @@
+======================================================================
+XGBOOST SURVIVAL (GPU/CPU) - RESULTADOS
+======================================================================
+Data/hora: 2026-06-08T13:07:37
+Coluna alvo: status_vital
+Modo de execucao: cuda_hist
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 84
+Peso de amostras (treino): ipcw(min_prob=0.001)
+Uso de pesos nas amostras: sim
+KFold (cv): 5
+Estrategia de CV: StratifiedKFold por evento
+Minimo exigido de eventos por fold (validacao): 5
+Minimo observado de eventos por fold (validacao): 1465
+n_jobs (GridSearch/permutation): 1
+xgb_n_jobs (modelo): 1
+Metrica de Grid/CV: Uno C-index (IPCW)
+
+--- Grid Search com KFold ---
+Melhor score de CV (C-index): 0.851356
+Desvio padrao do melhor score: 0.035160
+Melhores hiperparametros: {'model__colsample_bynode': 1.0, 'model__colsample_bytree': 0.85, 'model__gamma': 0.5, 'model__grow_policy': 'depthwise', 'model__learning_rate': 0.02, 'model__max_bin': 256, 'model__max_depth': 5, 'model__max_leaves': 0, 'model__min_child_weight': 5, 'model__n_estimators': 1000, 'model__reg_alpha': 0.5, 'model__reg_lambda': 1.0, 'model__subsample': 0.7}
+
+======================================================================
+METRICAS DE DISCRIMINACAO
+======================================================================
+C-index treino            : 0.851296
+C-index teste             : 0.845073
+Gap C-index (overfit)     : 0.006224
+Uno C-index teste (IPCW)  : 0.963566
+AUC dinamica media        : 0.757867
+
+[D de Royston]
+  D de Royston            : 1.346174
+  R2 de Royston           : 0.524189
+  (D > 1 = discriminacao razoavel; D > 2 = excelente)
+
+======================================================================
+METRICAS DE CALIBRACAO
+======================================================================
+Brier score medio         : 0.000681
+Integrated Brier (IBS)    : 0.000681
+  (IBS < 0.25 e considerado bom; IBS = 0.25 equivale ao modelo nulo)
+
+[Calibracao por decil de risco — tempo de referencia: 0.0]
+(Decil 1 = menor risco, Decil 10 = maior risco)
+(Razao E/O: 1.0 = calibracao perfeita; > 1 = subestima evento; < 1 = superestima)
+ decil    n  sobrev_esperada_modelo  taxa_evento_esperada  sobrev_observada_km  taxa_evento_observada   razao_E_O
+     1 1469                     1.0                   0.0               1.0000                 0.0000      0.0000
+     2 1469                     1.0                   0.0               1.0000                 0.0000      0.0000
+     3 1469                     1.0                   0.0               1.0000                 0.0000      0.0000
+     4 1469                     1.0                   0.0               1.0000                 0.0000      0.0000
+     5 1470                     1.0                   0.0               1.0000                 0.0000     41.1439
+     6 1469                     1.0                   0.0               1.0000                 0.0000      0.0000
+     7 1469                     1.0                   0.0               1.0000                 0.0000      5.8817
+     8 1469                     1.0                   0.0               0.9980                 0.0020 204230.8342
+     9 1469                     1.0                   0.0               0.9993                 0.0007  68155.7272
+    10 1470                     1.0                   0.0               0.9959                 0.0041 408245.4172
+
+======================================================================
+KS DE SOBREVIVENCIA (separacao entre grupos Evento vs. Censurado)
+======================================================================
+KS estatistico (2-amostras): 0.550032
+KS p-valor                 : 0.000000e+00
+KS maximo no decil         : 3 (KS = 0.544709)
+
+[KS por Decil de Risco — log-risco decrescente]
+(Analoga a tabela de KS / Ganho / Lift de classificacao)
+ decil pct_base  cum_pct_eventos  cum_pct_censurados  ks_decil
+     1      10%           0.4258              0.0536    0.3722
+     2      20%           0.6354              0.1379    0.4974
+     3      30%           0.7767              0.2320    0.5447
+     4      40%           0.8684              0.3332    0.5352
+     5      50%           0.9209              0.4400    0.4808
+     6      60%           0.9558              0.5493    0.4065
+     7      70%           0.9683              0.6617    0.3066
+     8      80%           0.9831              0.7739    0.2092
+     9      90%           0.9945              0.8865    0.1081
+    10     100%           1.0000              1.0000    0.0000
+
+======================================================================
+CURVAS DE KAPLAN-MEIER POR GRUPO DE RISCO
+======================================================================
+Log-rank test (baixo vs alto risco): chi2 = 1588.5571, p = 0.000000e+00
+
+  Baixo Risco: n=4897, eventos=66, S(max_t) = 0.9777
+  Risco Intermediario: n=4897, eventos=274, S(max_t) = 0.9137
+  Alto Risco: n=4898, eventos=1492, S(max_t) = 0.0000
+(Curvas completas exportadas para: results/test_curvas_km.csv)
+
+======================================================================
+DISTRIBUICAO DOS LOG-RISCOS POR STATUS
+======================================================================
+           grupo     n  media  mediana    std  p10  p25  p75  p90  min    max
+  Evento (obito)  1832    0.0      0.0 0.0001  0.0  0.0  0.0  0.0  0.0 0.0007
+Censurado (vivo) 12860    0.0      0.0 0.0000  0.0  0.0  0.0  0.0  0.0 0.0001
+
+======================================================================
+NET BENEFIT — DECISION CURVE ANALYSIS (simplificada)
+======================================================================
+(Baseada no tempo de referencia: 0.0)
+(Arquivo completo: results/net_benefit_dca.csv)
+ threshold_pt  net_benefit_modelo  net_benefit_tratar_todos  net_benefit_nao_tratar
+         0.01                 0.0                 -0.009413                     0.0
+         0.99                 0.0                -98.931936                     0.0
+
+======================================================================
+AUC DINAMICA E BRIER POR TEMPO
+======================================================================
+ tempo  auc_dinamica  brier_score
+0.0000      0.757867     0.000681
+0.0003      0.757867     0.000681
+0.0006      0.757867     0.000681
+0.0009      0.757867     0.000681
+0.0012      0.757867     0.000681
+
+======================================================================
+C-INDEX POR SUBGRUPO
+======================================================================
+ subgrupo    n  n_eventos  uno_cindex
+        0 6667        999    0.823655
+        1 8025        833    0.979320
+
+======================================================================
+TOP 20 FEATURE IMPORTANCE (gain do XGBoost)
+======================================================================
+                        feature  importance_gain
+razao_nao_tratamento_hospital_6         0.105915
+                         t_ptnm         0.041449
+     uf_hospital_regiao_Sudeste         0.040085
+historico_alcoolismo_clinico_ex         0.039991
+      uf_procedencia_regiao_Sul         0.038680
+    cat_localizacao_primaria_te         0.037094
+         uf_hospital_regiao_Sul         0.036915
+                          t_tnm         0.033739
+                          m_tnm         0.029585
+  uf_procedencia_regiao_Sudeste         0.024688
+razao_nao_tratamento_hospital_8         0.023776
+ primeiro_tratamento_hospital_8         0.019488
+exames_relevantes_diagnostico_5         0.018994
+ historico_tabagismo_clinico_ex         0.016987
+      mais_de_um_tumor_primario         0.016798
+                         m_ptnm         0.015785
+ primeiro_tratamento_hospital_2         0.015205
+exames_relevantes_diagnostico_2         0.013438
+           tempo_ate_tratamento         0.013174
+                         n_ptnm         0.012592
+
+======================================================================
+TOP 20 PERMUTATION IMPORTANCE (C-index no teste)
+======================================================================
+                            feature  importance_mean  importance_std
+        cat_localizacao_primaria_te         0.031784        0.000980
+    razao_nao_tratamento_hospital_6         0.018820        0.001006
+                              m_tnm         0.013945        0.001238
+                              idade         0.012834        0.001091
+                              t_tnm         0.009704        0.001083
+          tipo_histologico_tumor_te         0.006430        0.000472
+                             n_ptnm         0.005731        0.000460
+               tempo_ate_tratamento         0.005082        0.000724
+                             t_ptnm         0.004918        0.000601
+          mais_de_um_tumor_primario         0.002186        0.000492
+                 tempo_ate_consulta         0.001830        0.000244
+     primeiro_tratamento_hospital_2         0.001565        0.000523
+     primeiro_tratamento_hospital_4         0.001386        0.000333
+                              n_tnm         0.001367        0.000208
+                          tipo_caso         0.001197        0.000291
+     primeiro_tratamento_hospital_8         0.000900        0.000109
+diagnostico_tratamento_anteriores_3         0.000685        0.000092
+                             m_ptnm         0.000641        0.000164
+    razao_nao_tratamento_hospital_7         0.000444        0.000337
+    uf_hospital_regiao_Centro-Oeste         0.000268        0.000047
+
+======================================================================
+TOP 20 SHAP GLOBAL (mean(|SHAP|))
+======================================================================
+                        feature  mean_abs_shap
+    cat_localizacao_primaria_te       0.402870
+                          idade       0.268029
+                          t_tnm       0.238551
+                          m_tnm       0.202305
+      uf_procedencia_regiao_Sul       0.156614
+                         t_ptnm       0.140086
+      tipo_histologico_tumor_te       0.138366
+           tempo_ate_tratamento       0.135541
+     uf_hospital_regiao_Sudeste       0.133182
+ primeiro_tratamento_hospital_2       0.128703
+                         n_ptnm       0.116373
+exames_relevantes_diagnostico_5       0.100232
+razao_nao_tratamento_hospital_6       0.100182
+      mais_de_um_tumor_primario       0.092286
+         uf_hospital_regiao_Sul       0.085675
+             tempo_ate_consulta       0.082530
+  uf_procedencia_regiao_Sudeste       0.076496
+historico_alcoolismo_clinico_ex       0.064230
+ historico_tabagismo_clinico_ex       0.063730
+                          n_tnm       0.046494
+
+SHAP global CSV: results/xgboost_survival_shap_global.csv
+SHAP summary plot: results/xgboost_survival_shap_summary.png
+SHAP beeswarm plot: results/xgboost_survival_shap_beeswarm.png
