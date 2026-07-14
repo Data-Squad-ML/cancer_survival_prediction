@@ -79,7 +79,6 @@ OHE_PREFIXES = [
     "base_diagnostico_mais_importante_",
     "base_diagnostico_microscopica_",
     "primeiro_tratamento_hospital_",
-    "razao_nao_tratamento_hospital_",
     "historico_tabagismo_clinico_",
     "historico_alcoolismo_clinico_",
 ]
@@ -202,7 +201,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=Path("results/deepsurv_gpu_results.txt"))
     parser.add_argument("--output-dir", type=Path, default=Path("results"),
                         help="Diretorio para CSVs auxiliares de curvas e calibracao.")
-    parser.add_argument("--cv", type=int, default=5)
+    parser.add_argument("--cv", type=int, default=2)
     parser.add_argument("--perm-repeats", type=int, default=10)
     parser.add_argument("--random-state", type=int, default=42)
     parser.add_argument("--min-eval-times", type=int, default=8)

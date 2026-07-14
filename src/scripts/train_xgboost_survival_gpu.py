@@ -75,7 +75,6 @@ OHE_PREFIXES = [
     "base_diagnostico_mais_importante_",
     "base_diagnostico_microscopica_",
     "primeiro_tratamento_hospital_",
-    "razao_nao_tratamento_hospital_",
     "historico_tabagismo_clinico_",
     "historico_alcoolismo_clinico_",
 ]
@@ -112,7 +111,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("results"),
         help="Diretorio para CSVs auxiliares de curvas e calibracao.",
     )
-    parser.add_argument("--cv", type=int, default=5)
+    parser.add_argument("--cv", type=int, default=2)
     parser.add_argument("--n-jobs", type=int, default=1)
     parser.add_argument("--xgb-n-jobs", type=int, default=1)
     parser.add_argument("--perm-repeats", type=int, default=10)
@@ -488,18 +487,13 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [600, 800, 1000],
-        "model__max_depth": [3, 4, 5],
-        "model__learning_rate": [0.01, 0.02, 0.03],
-        "model__subsample": [0.7, 0.85, 1.0],
-        "model__colsample_bytree": [0.7, 0.85, 1.0],
-        "model__min_child_weight": [1, 5],
+        "model__n_estimators": [600, 800],
+        "model__max_depth": [3, 4],
+        "model__learning_rate": [0.01, 0.03],
+        "model__subsample": [0.8, 1.0],
+        "model__colsample_bytree": [0.8, 1.0],
         "model__gamma": [0.0, 0.5],
-        "model__max_bin": [256],
-        "model__grow_policy": ["depthwise"],
         "model__max_leaves": [0, 64],
-        "model__colsample_bynode": [1.0],
-        "model__reg_alpha": [0.0, 0.5],
         "model__reg_lambda": [1.0, 3.0],
     }
 
