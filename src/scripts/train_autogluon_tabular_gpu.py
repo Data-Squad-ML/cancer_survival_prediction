@@ -10,7 +10,15 @@ from pathlib import Path
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import (
+    average_precision_score,
+    brier_score_loss,
+    f1_score,
+    log_loss,
+    matthews_corrcoef,
+    roc_auc_score,
+    roc_curve,
+)
 
 
 FEATURE_COLS_BASE = [
@@ -148,6 +156,55 @@ def build_hyperparameters(num_gpus: int) -> dict:
     }
 
 
+def choose_prediction_model(
+    predictor: TabularPredictor,
+    leaderboard: pd.DataFrame,
+    sample_data: pd.DataFrame,
+) -> str | None:
+    if leaderboard.empty or "model" not in leaderboard.columns:
+        return None
+
+    last_error: Exception | None = None
+
+    for model_name in leaderboard["model"].astype(str):
+        try:
+            predictor.predict_proba(sample_data, model=model_name)
+            return model_name
+        except Exception as exc:
+            last_error = exc
+
+    if last_error is not None:
+        raise last_error
+
+    return None
+
+
+def compute_binary_metrics(y_true: pd.Series, y_pred_proba: pd.Series | pd.DataFrame) -> dict[str, float]:
+    if isinstance(y_pred_proba, pd.DataFrame):
+        if 1 in y_pred_proba.columns:
+            y_score = y_pred_proba[1]
+        else:
+            y_score = y_pred_proba.iloc[:, -1]
+    else:
+        y_score = y_pred_proba
+
+    y_true_int = pd.Series(y_true).astype(int)
+    y_score = pd.Series(y_score).astype(float)
+    y_pred = (y_score >= 0.5).astype(int)
+
+    fpr, tpr, _ = roc_curve(y_true_int, y_score)
+
+    return {
+        "ROC-AUC": float(roc_auc_score(y_true_int, y_score)),
+        "PR-AUC": float(average_precision_score(y_true_int, y_score)),
+        "KS": float((tpr - fpr).max()),
+        "F1-score": float(f1_score(y_true_int, y_pred)),
+        "MCC": float(matthews_corrcoef(y_true_int, y_pred)),
+        "Brier": float(brier_score_loss(y_true_int, y_score)),
+        "Log-Loss": float(log_loss(y_true_int, y_score, labels=[0, 1])),
+    }
+
+
 def save_report(
     report_path: Path,
     target: str,
@@ -157,7 +214,7 @@ def save_report(
     test_rows: int,
     feature_cols: list[str],
     best_model: str,
-    test_auc: float,
+    metrics: dict[str, float],
     test_metrics: dict,
 ) -> None:
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -174,10 +231,15 @@ def save_report(
         f"Amostras de teste: {test_rows}",
         f"Total de features selecionadas: {len(feature_cols)}",
         f"Melhor modelo (leaderboard): {best_model}",
-        f"ROC-AUC no teste: {test_auc:.6f}",
         "",
-        "--- Metricas de evaluate() no teste ---",
+        "--- Metricas no teste ---",
     ]
+
+    for metric_name, metric_value in metrics.items():
+        lines.append(f"{metric_name}: {metric_value:.6f}")
+
+    lines.append("")
+    lines.append("--- Metricas de evaluate() no teste ---")
 
     for metric_name, metric_value in sorted(test_metrics.items()):
         try:
@@ -231,17 +293,14 @@ def main() -> None:
     leaderboard_train.to_csv(args.leaderboard_path.parent / "leaderboard_train.csv", index=False)
 
     y_true = test_data[args.target]
-    y_pred_proba = predictor.predict_proba(test_data)
-    if isinstance(y_pred_proba, pd.DataFrame):
-        if 1 in y_pred_proba.columns:
-            y_score = y_pred_proba[1]
-        else:
-            y_score = y_pred_proba.iloc[:, -1]
-    else:
-        y_score = y_pred_proba
+    prediction_model = choose_prediction_model(predictor, leaderboard, test_data.head(5))
 
-    test_auc = roc_auc_score(y_true, y_score)
-    test_metrics = predictor.evaluate(test_data, silent=True)
+    if prediction_model is None:
+        raise ValueError("Nao foi possivel selecionar um modelo para predicao no teste.")
+
+    y_pred_proba = predictor.predict_proba(test_data, model=prediction_model)
+    metrics = compute_binary_metrics(y_true, y_pred_proba)
+    test_metrics = predictor.evaluate(test_data, model=prediction_model, silent=True)
 
     best_model = leaderboard.iloc[0]["model"] if not leaderboard.empty else "N/A"
 
@@ -253,14 +312,16 @@ def main() -> None:
         train_rows=len(train_data),
         test_rows=len(test_data),
         feature_cols=feature_cols,
-        best_model=str(best_model),
-        test_auc=float(test_auc),
+        best_model=str(prediction_model),
+        metrics=metrics,
         test_metrics=test_metrics,
     )
 
     print("Treino AutoGluon finalizado.")
     print(f"Melhor modelo: {best_model}")
-    print(f"ROC-AUC teste: {test_auc:.6f}")
+    print(f"Modelo usado no teste: {prediction_model}")
+    for metric_name, metric_value in metrics.items():
+        print(f"{metric_name} teste: {metric_value:.6f}")
     print(f"Leaderboard salvo em: {args.leaderboard_path}")
     print(f"Relatorio salvo em: {args.report_path}")
 
