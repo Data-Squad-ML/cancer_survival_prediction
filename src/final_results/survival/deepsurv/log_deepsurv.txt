@@ -1,0 +1,41 @@
+Usando dispositivo: cpu
+Total de combinacoes no grid: 24
+CV: StratifiedKFold(n_splits=2) | Dispositivo: cpu
+[1/24] uno_cindex=0.850258 +/- 0.020628 params={'hidden_sizes': [128, 64], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[2/24] uno_cindex=0.833215 +/- 0.023794 params={'hidden_sizes': [128, 64], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[3/24] uno_cindex=0.852085 +/- 0.019836 params={'hidden_sizes': [128, 64], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[4/24] uno_cindex=0.844636 +/- 0.022908 params={'hidden_sizes': [128, 64], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[5/24] uno_cindex=0.853975 +/- 0.020784 params={'hidden_sizes': [128, 64], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[6/24] uno_cindex=0.847139 +/- 0.022366 params={'hidden_sizes': [128, 64], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[7/24] uno_cindex=0.845256 +/- 0.020748 params={'hidden_sizes': [128, 64], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[8/24] uno_cindex=0.853841 +/- 0.020270 params={'hidden_sizes': [128, 64], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[9/24] uno_cindex=0.848717 +/- 0.019946 params={'hidden_sizes': [256, 128], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[10/24] uno_cindex=0.824511 +/- 0.024878 params={'hidden_sizes': [256, 128], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[11/24] uno_cindex=0.853438 +/- 0.020061 params={'hidden_sizes': [256, 128], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[12/24] uno_cindex=0.835217 +/- 0.023316 params={'hidden_sizes': [256, 128], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[13/24] uno_cindex=0.853817 +/- 0.019715 params={'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[14/24] uno_cindex=0.839422 +/- 0.022131 params={'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[15/24] uno_cindex=0.850051 +/- 0.020162 params={'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[16/24] uno_cindex=0.850402 +/- 0.020167 params={'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[17/24] uno_cindex=0.837579 +/- 0.025143 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[18/24] uno_cindex=0.811941 +/- 0.028232 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.1, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[19/24] uno_cindex=0.852647 +/- 0.021419 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[20/24] uno_cindex=0.827501 +/- 0.025337 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.1, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[21/24] uno_cindex=0.851340 +/- 0.020718 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[22/24] uno_cindex=0.835095 +/- 0.021584 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+[23/24] uno_cindex=0.847950 +/- 0.020909 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+[24/24] uno_cindex=0.848387 +/- 0.021406 params={'hidden_sizes': [256, 128, 64], 'dropout': 0.3, 'lr': 0.0003, 'batch_size': 512, 'epochs': 75, 'activation': 'relu', 'l2': 0.0001}
+
+Melhor Uno C-index CV: 0.853975 +/- 0.020784
+Melhores params: {'hidden_sizes': [128, 64], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 512, 'epochs': 75, 'activation': 'selu', 'l2': 0.0001}
+
+Calculando metricas adicionais...
+  Log-rank (baixo vs alto risco): chi2=1676.0380, p=0.0000e+00
+  KS estatistico: 0.574455 (decil 3)
+  D de Royston: 1.223824, R2: 0.476582
+  [CSV] Curvas KM salvas em: results/test_curvas_km.csv
+  [CSV] Brier por tempo salvo em: results/brier_score_por_tempo.csv
+
+Relatorio salvo em: results/deepsurv_gpu_results.txt
+
+Treinamento DeepSurv concluido. Resultados salvos em: results/deepsurv_gpu_results.txt
