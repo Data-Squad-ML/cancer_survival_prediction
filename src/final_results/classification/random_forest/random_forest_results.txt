@@ -1,50 +1,50 @@
 ======================================================================
 RANDOM FOREST - RESULTADOS COMPLETOS
 ======================================================================
-Data/hora              : 2026-06-03T09:51:44
+Data/hora              : 2026-07-15T12:05:04
 Coluna alvo            : status_vital
 Amostras de treino     : 58767
 Amostras de teste      : 14692
-Total de features      : 84
+Total de features      : 76
 Uso de class_weight    : sim
 Metrica de Grid/CV     : roc_auc (KFold manual)
 
 --- Grid Search manual com KFold ---
-Melhor score de CV     : 0.878713
-Desvio padrao do score : 0.001184
-Melhores hiperparametros: {'n_estimators': 400, 'max_depth': None, 'min_samples_split': 5, 'min_samples_leaf': 1, 'max_features': 'log2'}
+Melhor score de CV     : 0.871562
+Desvio padrao do score : 0.001198
+Melhores hiperparametros: {'n_estimators': 400, 'max_depth': None, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt'}
 
 --- Metricas TREINO ---
 
   [Discriminacao]
-  AUC-ROC       : 0.999849
-  AUC-PR        : 0.999979   (Average Precision)
-  Gini          : 0.999698
+  AUC-ROC       : 0.998835
+  AUC-PR        : 0.999838   (Average Precision)
+  Gini          : 0.997670
 
   [Predicao — threshold = 0.5]
-  Accuracy      : 0.996801
-  Precision     : 0.999902
-  Recall        : 0.996442
-  F1-Score      : 0.998169
-  MCC           : 0.985591
+  Accuracy      : 0.988020
+  Precision     : 0.998174
+  Recall        : 0.988122
+  F1-Score      : 0.993122
+  MCC           : 0.947470
 
   [Calibracao]
-  Brier Score   : 0.024203   (menor e melhor)
-  Log-Loss      : 0.122725
+  Brier Score   : 0.032399   (menor e melhor)
+  Log-Loss      : 0.149032
 
   [Confusion Matrix]
-    7324       5
-     183   51255
+    7236      93
+     611   50827
 
   [Classification Report]
                 precision    recall  f1-score   support
   
-             0       0.98      1.00      0.99      7329
-             1       1.00      1.00      1.00     51438
+             0       0.92      0.99      0.95      7329
+             1       1.00      0.99      0.99     51438
   
-      accuracy                           1.00     58767
-     macro avg       0.99      1.00      0.99     58767
-  weighted avg       1.00      1.00      1.00     58767
+      accuracy                           0.99     58767
+     macro avg       0.96      0.99      0.97     58767
+  weighted avg       0.99      0.99      0.99     58767
 
   [KS / Ganho / Lift por Decil]
   KS estatistico : 0.913994   (maximo no decil 8)
@@ -59,81 +59,81 @@ Melhores hiperparametros: {'n_estimators': 400, 'max_depth': None, 'min_samples_
       6     60%   0.6855   1.1425
       7     70%   0.7997   1.1425
       8     80%   0.9140   1.1425 <- KS
-      9     90%   0.9998   1.1109
+      9     90%   0.9986   1.1095
      10    100%   1.0000   1.0000
 
 --- Metricas TESTE ---
 
   [Discriminacao]
-  AUC-ROC       : 0.883741
-  AUC-PR        : 0.980773   (Average Precision)
-  Gini          : 0.767481
+  AUC-ROC       : 0.874739
+  AUC-PR        : 0.979243   (Average Precision)
+  Gini          : 0.749478
 
   [Predicao — threshold = 0.5]
-  Accuracy      : 0.894705
-  Precision     : 0.914244
-  Recall        : 0.970762
-  F1-Score      : 0.941656
-  MCC           : 0.427684
+  Accuracy      : 0.885720
+  Precision     : 0.919047
+  Recall        : 0.953421
+  F1-Score      : 0.935918
+  MCC           : 0.416050
 
   [Calibracao]
-  Brier Score   : 0.078493   (menor e melhor)
-  Log-Loss      : 0.262454
+  Brier Score   : 0.084814   (menor e melhor)
+  Log-Loss      : 0.280417
 
   [Confusion Matrix]
-     661    1171
-     376   12484
+     752    1080
+     599   12261
 
   [Classification Report]
                 precision    recall  f1-score   support
   
-             0       0.64      0.36      0.46      1832
-             1       0.91      0.97      0.94     12860
+             0       0.56      0.41      0.47      1832
+             1       0.92      0.95      0.94     12860
   
       accuracy                           0.89     14692
-     macro avg       0.78      0.67      0.70     14692
-  weighted avg       0.88      0.89      0.88     14692
+     macro avg       0.74      0.68      0.70     14692
+  weighted avg       0.87      0.89      0.88     14692
 
   [KS / Ganho / Lift por Decil]
-  KS estatistico : 0.602082   (maximo no decil 7)
+  KS estatistico : 0.579632   (maximo no decil 7)
 
   Decil   % base    Ganho     Lift
   -----  -------  -------  -------
       1     10%   0.1142   1.1417
-      2     20%   0.2281   1.1405
-      3     30%   0.3418   1.1391
-      4     40%   0.4544   1.1358
-      5     50%   0.5646   1.1292
-      6     60%   0.6715   1.1191
-      7     70%   0.7751   1.1072 <- KS
-      8     80%   0.8687   1.0859
-      9     90%   0.9519   1.0576
+      2     20%   0.2281   1.1401
+      3     30%   0.3415   1.1383
+      4     40%   0.4540   1.1349
+      5     50%   0.5639   1.1278
+      6     60%   0.6710   1.1182
+      7     70%   0.7723   1.1032 <- KS
+      8     80%   0.8665   1.0831
+      9     90%   0.9480   1.0533
      10    100%   1.0000   1.0000
 
 --- Gaps treino → teste (sinal de overfitting) ---
-  ΔAUC-ROC      : +0.116108
-  ΔF1-Score     : +0.056514
-  ΔBrier Score  : +0.054290
+  ΔAUC-ROC      : +0.124096
+  ΔF1-Score     : +0.057204
+  ΔBrier Score  : +0.052414
 
 --- Top 20 Permutation Importance (teste) ---
-                        feature  importance_mean  importance_std
-    cat_localizacao_primaria_te         0.021397        0.001304
-                          m_tnm         0.014926        0.001251
-razao_nao_tratamento_hospital_6         0.010374        0.000747
-                          idade         0.008775        0.000624
-      tipo_histologico_tumor_te         0.007130        0.000766
-                         t_ptnm         0.006998        0.000559
-                      tipo_caso         0.005870        0.000646
-                          t_tnm         0.005403        0.000688
-                         m_ptnm         0.005002        0.000643
-                         n_ptnm         0.004756        0.000474
-           tempo_ate_tratamento         0.004035        0.000947
-      mais_de_um_tumor_primario         0.003467        0.000626
-                          n_tnm         0.002222        0.000560
- primeiro_tratamento_hospital_4         0.002061        0.000624
-                   escolaridade         0.001989        0.000483
- primeiro_tratamento_hospital_2         0.001981        0.000562
- subcat_localizacao_primaria_te         0.001914        0.000338
-razao_nao_tratamento_hospital_8         0.001831        0.000373
-             tempo_ate_consulta         0.001813        0.000703
-      uf_procedencia_regiao_Sul         0.001794        0.000275
+                       feature  importance_mean  importance_std
+   cat_localizacao_primaria_te         0.026336        0.001312
+                         m_tnm         0.016711        0.001295
+                         idade         0.009958        0.000777
+     tipo_histologico_tumor_te         0.009566        0.000853
+                        t_ptnm         0.008115        0.000748
+                         t_tnm         0.006470        0.000869
+                     tipo_caso         0.005943        0.000600
+          tempo_ate_tratamento         0.004942        0.000694
+                        n_ptnm         0.004847        0.000610
+                        m_ptnm         0.004744        0.000476
+     mais_de_um_tumor_primario         0.003480        0.000646
+                         n_tnm         0.002546        0.000411
+            tempo_ate_consulta         0.002422        0.000560
+primeiro_tratamento_hospital_4         0.002085        0.000575
+     uf_procedencia_regiao_Sul         0.002056        0.000442
+subcat_localizacao_primaria_te         0.002054        0.000506
+        uf_hospital_regiao_Sul         0.001934        0.000385
+                  escolaridade         0.001765        0.000441
+primeiro_tratamento_hospital_2         0.001690        0.000586
+    uf_hospital_regiao_Sudeste         0.000954        0.000392
