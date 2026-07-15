@@ -608,6 +608,18 @@ def compute_survival_metrics(
     )
     survival_functions_test = breslow.get_survival_function(risk_test)
     domain_min, domain_max = survival_functions_test[0].domain
+    test_min = max(float(np.min(y_test_surv["time"])), 1e-6)
+    test_max = float(np.max(y_test_surv["time"]))
+    test_max = np.nextafter(test_max, float("-inf"))
+
+    domain_min = max(float(domain_min), test_min)
+    domain_max = min(float(domain_max), test_max)
+    if domain_max <= domain_min:
+        raise ValueError(
+            "Nao foi possivel encontrar intervalo valido para metricas dinamicas dentro "
+            "do follow-up do teste."
+        )
+
     eps = max((domain_max - domain_min) * 1e-3, 1e-9)
 
     # clipped_times: subconjunto de eval_times dentro do dominio Breslow.
@@ -1402,7 +1414,6 @@ def main() -> None:
 
     # Recupera os risk scores gerados internamente pelo compute_survival_metrics
     risk_test = metrics.pop("risk_test")
-    risk_train = metrics.pop("risk_train")
 
     print("\nCalculando metricas adicionais...")
 
