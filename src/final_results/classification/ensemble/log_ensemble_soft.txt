@@ -9,7 +9,7 @@ Relatorio salvo em: ensemble_results.txt
 Resumo rapido — Ensemble vs Individuais:
   Modelo                 AUC-ROC        KS        F1       MCC
   --------------------  --------  --------  --------  --------
-  Ensemble                0.8842    0.5890    0.9099    0.4632
-  XGBoost                 0.8818    0.5834    0.8794    0.4390
-  Random Forest           0.8837    0.6021    0.9417    0.4277
-  Deep Learning           0.8641    0.5603    0.8690    0.4083
+  Ensemble                0.8758    0.5803    0.8993    0.4441
+  XGBoost                 0.8741    0.5840    0.8756    0.4318
+  Random Forest           0.8747    0.5796    0.9359    0.4161
+  Deep Learning           0.8570    0.5453    0.8579    0.3950

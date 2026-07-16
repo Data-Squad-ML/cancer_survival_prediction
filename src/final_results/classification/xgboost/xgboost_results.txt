@@ -1,140 +1,140 @@
 ======================================================================
 XGBOOST - RESULTADOS COMPLETOS
 ======================================================================
-Data/hora              : 2026-06-01T22:25:43
+Data/hora              : 2026-07-15T22:45:31
 Coluna alvo            : status_vital
 Modo de execucao       : cuda_hist
 Amostras de treino     : 58767
 Amostras de teste      : 14692
-Total de features      : 84
+Total de features      : 76
 Uso de class_weight    : sim
 Metrica de Grid/CV     : roc_auc
 
 --- Grid Search com KFold ---
-Melhor score de CV     : 0.881126
-Desvio padrao do score : 0.003017
+Melhor score de CV     : 0.874105
+Desvio padrao do score : 0.001754
 Melhores hiperparametros: {'model__colsample_bytree': 0.8, 'model__gamma': 0.0, 'model__learning_rate': 0.03, 'model__max_depth': 6, 'model__min_child_weight': 3, 'model__n_estimators': 400, 'model__subsample': 0.8}
 
 --- Metricas TREINO ---
 
   [Discriminacao]
-  AUC-ROC       : 0.917913
-  AUC-PR        : 0.986774   (Average Precision)
-  Gini          : 0.835826
+  AUC-ROC       : 0.918261
+  AUC-PR        : 0.986996   (Average Precision)
+  Gini          : 0.836523
 
   [Predicao — threshold = 0.5]
-  Accuracy      : 0.822945
-  Precision     : 0.975062
-  Recall        : 0.818655
-  F1-Score      : 0.890040
-  MCC           : 0.502785
+  Accuracy      : 0.820597
+  Precision     : 0.976288
+  Recall        : 0.814826
+  F1-Score      : 0.888279
+  MCC           : 0.503332
 
   [Calibracao]
-  Brier Score   : 0.121117   (menor e melhor; baseline = prevalencia*(1-prevalencia))
-  Log-Loss      : 0.376957
+  Brier Score   : 0.122758   (menor e melhor; baseline = prevalencia*(1-prevalencia))
+  Log-Loss      : 0.381916
 
   [Confusion Matrix]
-    6252    1077
-    9328   42110
+    6311    1018
+    9525   41913
 
   [Classification Report]
                 precision    recall  f1-score   support
   
-             0       0.40      0.85      0.55      7329
-             1       0.98      0.82      0.89     51438
+             0       0.40      0.86      0.54      7329
+             1       0.98      0.81      0.89     51438
   
       accuracy                           0.82     58767
      macro avg       0.69      0.84      0.72     58767
   weighted avg       0.90      0.82      0.85     58767
 
   [KS / Ganho / Lift por Decil]
-  KS estatistico : 0.665834   (maximo no decil 7)
+  KS estatistico : 0.674096   (maximo no decil 7)
 
   Decil   % base    Ganho     Lift
   -----  -------  -------  -------
       1     10%   0.1143   1.1425
-      2     20%   0.2284   1.1420
-      3     30%   0.3422   1.1405
-      4     40%   0.4555   1.1387
-      5     50%   0.5676   1.1353
-      6     60%   0.6777   1.1294
-      7     70%   0.7830   1.1186 ← KS
-      8     80%   0.8811   1.1013
-      9     90%   0.9610   1.0678
+      2     20%   0.2284   1.1418
+      3     30%   0.3423   1.1408
+      4     40%   0.4558   1.1394
+      5     50%   0.5679   1.1358
+      6     60%   0.6781   1.1302
+      7     70%   0.7841   1.1201 ← KS
+      8     80%   0.8815   1.1019
+      9     90%   0.9598   1.0664
      10    100%   1.0000   1.0000
 
 --- Metricas TESTE ---
 
   [Discriminacao]
-  AUC-ROC       : 0.881822
-  AUC-PR        : 0.980086   (Average Precision)
-  Gini          : 0.763645
+  AUC-ROC       : 0.874112
+  AUC-PR        : 0.978817   (Average Precision)
+  Gini          : 0.748225
 
   [Predicao — threshold = 0.5]
-  Accuracy      : 0.805608
-  Precision     : 0.961950
-  Recall        : 0.809953
-  F1-Score      : 0.879433
-  MCC           : 0.439029
+  Accuracy      : 0.800163
+  Precision     : 0.961753
+  Recall        : 0.803655
+  F1-Score      : 0.875625
+  MCC           : 0.431809
 
   [Calibracao]
-  Brier Score   : 0.131668   (menor e melhor; baseline = prevalencia*(1-prevalencia))
-  Log-Loss      : 0.403448
+  Brier Score   : 0.135890   (menor e melhor; baseline = prevalencia*(1-prevalencia))
+  Log-Loss      : 0.415421
 
   [Confusion Matrix]
-    1420     412
-    2444   10416
+    1421     411
+    2525   10335
 
   [Classification Report]
                 precision    recall  f1-score   support
   
-             0       0.37      0.78      0.50      1832
-             1       0.96      0.81      0.88     12860
+             0       0.36      0.78      0.49      1832
+             1       0.96      0.80      0.88     12860
   
-      accuracy                           0.81     14692
-     macro avg       0.66      0.79      0.69     14692
-  weighted avg       0.89      0.81      0.83     14692
+      accuracy                           0.80     14692
+     macro avg       0.66      0.79      0.68     14692
+  weighted avg       0.89      0.80      0.83     14692
 
   [KS / Ganho / Lift por Decil]
-  KS estatistico : 0.583373   (maximo no decil 7)
+  KS estatistico : 0.583997   (maximo no decil 7)
 
   Decil   % base    Ganho     Lift
   -----  -------  -------  -------
       1     10%   0.1142   1.1417
-      2     20%   0.2281   1.1405
-      3     30%   0.3411   1.1368
-      4     40%   0.4534   1.1335
-      5     50%   0.5638   1.1277
-      6     60%   0.6715   1.1191
-      7     70%   0.7728   1.1039 ← KS
-      8     80%   0.8694   1.0868
-      9     90%   0.9512   1.0569
+      2     20%   0.2278   1.1390
+      3     30%   0.3409   1.1362
+      4     40%   0.4530   1.1325
+      5     50%   0.5644   1.1288
+      6     60%   0.6703   1.1171
+      7     70%   0.7729   1.1040 ← KS
+      8     80%   0.8675   1.0843
+      9     90%   0.9478   1.0531
      10    100%   1.0000   1.0000
 
 --- Gaps treino → teste (sinal de overfitting) ---
-  ΔAUC-ROC      : +0.036090   (positivo = melhor no treino)
-  ΔF1-Score     : +0.010607   (positivo = melhor no treino)
-  ΔBrier Score  : +0.010551   (positivo = pior calibracao no teste)
+  ΔAUC-ROC      : +0.044149   (positivo = melhor no treino)
+  ΔF1-Score     : +0.012654   (positivo = melhor no treino)
+  ΔBrier Score  : +0.013131   (positivo = pior calibracao no teste)
 
 --- Top 20 Permutation Importance (teste) ---
                             feature  importance_mean  importance_std
-        cat_localizacao_primaria_te         0.028886        0.001497
-                              m_tnm         0.018629        0.001250
-    razao_nao_tratamento_hospital_6         0.017536        0.000804
-          tipo_histologico_tumor_te         0.011960        0.001185
-                              idade         0.011921        0.001311
-                          tipo_caso         0.009146        0.000755
-                              t_tnm         0.006940        0.000800
-                             t_ptnm         0.006829        0.000754
-                             n_ptnm         0.005865        0.000657
-          mais_de_um_tumor_primario         0.005386        0.001046
-               tempo_ate_tratamento         0.004912        0.000763
-diagnostico_tratamento_anteriores_3         0.003393        0.000477
-                 tempo_ate_consulta         0.002668        0.000541
-             uf_hospital_regiao_Sul         0.002306        0.000382
-             ocupacao_principal_gap         0.002116        0.000393
-          uf_procedencia_regiao_Sul         0.002005        0.000296
-     primeiro_tratamento_hospital_4         0.001436        0.000187
-                       escolaridade         0.001413        0.000457
-     primeiro_tratamento_hospital_3         0.001093        0.000215
-     subcat_localizacao_primaria_te         0.001006        0.000330
+        cat_localizacao_primaria_te         0.032401        0.001775
+                              m_tnm         0.021079        0.001252
+          tipo_histologico_tumor_te         0.014370        0.001280
+                          tipo_caso         0.011810        0.000948
+                              idade         0.011703        0.001119
+                              t_tnm         0.006860        0.000701
+                             t_ptnm         0.006551        0.000817
+                             n_ptnm         0.006449        0.000715
+               tempo_ate_tratamento         0.006137        0.000902
+          mais_de_um_tumor_primario         0.005762        0.001000
+diagnostico_tratamento_anteriores_3         0.003893        0.000517
+                 tempo_ate_consulta         0.003250        0.000498
+             uf_hospital_regiao_Sul         0.002517        0.000268
+             ocupacao_principal_gap         0.002359        0.000425
+          uf_procedencia_regiao_Sul         0.001961        0.000325
+                       escolaridade         0.001590        0.000467
+     primeiro_tratamento_hospital_4         0.001443        0.000275
+     subcat_localizacao_primaria_te         0.001170        0.000246
+     primeiro_tratamento_hospital_3         0.001020        0.000147
+  historico_tabagismo_clinico_atual         0.000927        0.000289

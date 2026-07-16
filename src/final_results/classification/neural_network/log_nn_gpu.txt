@@ -1,0 +1,4 @@
+Iniciando Grid Search (1 combos)...
+AUC: 0.8508 com {'hidden_sizes': [256, 128], 'dropout': 0.3, 'lr': 0.001, 'batch_size': 1024, 'epochs': 100, 'activation': 'relu'}
+
+Finalizado! Relatório em deep_learning_results.txt

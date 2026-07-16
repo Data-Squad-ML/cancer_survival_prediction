@@ -6,7 +6,7 @@ Relatorio salvo em: ensemble_hard_results.txt
 Resumo — Ensemble hard voting vs Individuais:
   Modelo                        F1       MCC   AUC-ROC
   ----------------------  --------  --------  --------
-  Ensemble (hard)           0.9001    0.4459       n/d
-  XGBoost                   0.8794    0.4390    0.8818
-  Random Forest             0.9417    0.4277    0.8837
-  Deep Learning             0.8690    0.4083    0.8641
+  Ensemble (hard)           0.8928    0.4330       n/d
+  XGBoost                   0.8756    0.4318    0.8741
+  Random Forest             0.9359    0.4161    0.8747
+  Deep Learning             0.8579    0.3950    0.8570

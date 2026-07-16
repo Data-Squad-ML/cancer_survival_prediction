@@ -1,0 +1,14 @@
+Fitting 5 folds for each of 1 candidates, totalling 5 fits
+
+Treinamento concluido em modo cuda_hist.
+Resultados salvos em: xgboost_results.txt
+Probabilidades de teste salvas em: xgboost_test_proba.npy
+
+Resumo rapido — conjunto de TESTE:
+  AUC-ROC    : 0.8741
+  AUC-PR     : 0.9788
+  KS         : 0.5840   (decil 7)
+  F1-Score   : 0.8756
+  MCC        : 0.4318
+  Brier Score: 0.1359
+  Log-Loss   : 0.4154

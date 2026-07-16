@@ -609,9 +609,12 @@ def main() -> None:
         grid_search=grid_search,
         perm_df=perm_df,
     )
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    np.save(args.output.parent / "xgboost_test_proba.npy", test_proba)
 
     print(f"\nTreinamento concluido em modo {xgb_mode}.")
     print(f"Resultados salvos em: {args.output}")
+    print(f"Probabilidades de teste salvas em: {args.output.parent / 'xgboost_test_proba.npy'}")
     print(f"\nResumo rapido — conjunto de TESTE:")
     print(f"  AUC-ROC    : {test_metrics['auc_roc']:.4f}")
     print(f"  AUC-PR     : {test_metrics['auc_pr']:.4f}")
