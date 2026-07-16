@@ -212,3 +212,4 @@ gpu_ic.txt
 
 # results models autogluon (muito pesados)
 src/scripts/results/autogluon/results1/autogluon_tabular_models/models/
+src/final_results/classification/autogluon/results/autogluon_tabular_models/models/

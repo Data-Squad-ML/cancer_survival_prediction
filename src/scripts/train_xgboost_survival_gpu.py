@@ -591,6 +591,11 @@ def compute_survival_metrics(
     risk_train = model.predict(x_train)
     risk_test = model.predict(x_test)
 
+    # Garante orientação consistente do risco
+    if np.mean(risk_train[y_train_surv["event"]]) < np.mean(risk_train[~y_train_surv["event"]]):
+        risk_train = -risk_train
+        risk_test = -risk_test
+
     cindex_train = float(
         concordance_index_censored(y_train_surv["event"], y_train_surv["time"], risk_train)[0]
     )
@@ -599,13 +604,20 @@ def compute_survival_metrics(
     )
     uno_cindex_test = float(concordance_index_ipcw(y_train_surv, y_test_surv, risk_test)[0])
 
-    # Breslow para funcao de sobrevivencia — determina o dominio valido primeiro,
-    # para garantir que AUC, Brier e survival_test usem EXATAMENTE os mesmos tempos.
+    risk_train = np.asarray(risk_train, dtype=float)
+
+    # Centraliza o preditor linear
+    risk_train -= np.mean(risk_train)
+
     breslow = BreslowEstimator().fit(
         y_train_surv["event"],
         y_train_surv["time"],
         risk_train,
     )
+
+    risk_test = np.asarray(risk_test, dtype=float)
+    risk_test -= np.mean(risk_train)
+
     survival_functions_test = breslow.get_survival_function(risk_test)
     domain_min, domain_max = survival_functions_test[0].domain
     test_min = max(float(np.min(y_test_surv["time"])), 1e-6)
@@ -826,9 +838,33 @@ def compute_km_risk_groups(
     event: np.ndarray,
     n_groups: int = 3,
 ) -> dict:
-    """Divide amostras em n_groups por quantil de log-risco e calcula KM + log-rank."""
-    thresholds = np.quantile(log_risk, np.linspace(0, 1, n_groups + 1))
-    labels = np.digitize(log_risk, thresholds[1:-1])
+    """
+    Divide pacientes em grupos de risco por quantis.
+    Detecta automaticamente se o score do modelo está invertido.
+    """
+
+    log_risk = np.asarray(log_risk).copy()
+    event = np.asarray(event).astype(bool)
+
+    # -----------------------------------------------------
+    # Detecta automaticamente orientação do risco
+    # -----------------------------------------------------
+    if np.mean(log_risk[event]) < np.mean(log_risk[~event]):
+        log_risk = -log_risk
+
+    # -----------------------------------------------------
+    # Divide exatamente em n grupos
+    # -----------------------------------------------------
+    order = np.argsort(log_risk)
+
+    labels = np.zeros(len(log_risk), dtype=int)
+
+    group_size = len(log_risk) // n_groups
+
+    for g in range(n_groups - 1):
+        labels[order[g * group_size:(g + 1) * group_size]] = g
+
+    labels[order[(n_groups - 1) * group_size:]] = n_groups - 1
 
     group_labels = (
         ["Baixo Risco", "Risco Intermediario", "Alto Risco"]
@@ -837,11 +873,16 @@ def compute_km_risk_groups(
     )
 
     km_results = {}
+
     for g in range(n_groups):
+
         mask = labels == g
+
         if mask.sum() < 5:
             continue
+
         t_km, s_km = km_curve(time[mask], event[mask])
+
         km_results[group_labels[g]] = {
             "times": t_km,
             "survival": s_km,
@@ -851,9 +892,12 @@ def compute_km_risk_groups(
 
     mask_low = labels == 0
     mask_high = labels == (n_groups - 1)
+
     chi2, p_val = logrank_test_two_groups(
-        time[mask_low], event[mask_low],
-        time[mask_high], event[mask_high],
+        time[mask_low],
+        event[mask_low],
+        time[mask_high],
+        event[mask_high],
     )
 
     return {
@@ -862,7 +906,6 @@ def compute_km_risk_groups(
         "logrank_pval_low_vs_high": p_val,
         "n_groups": n_groups,
     }
-
 
 # ---------------------------------------------------------------------------
 # 2. KS de sobrevivência
