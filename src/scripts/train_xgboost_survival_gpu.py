@@ -591,10 +591,9 @@ def compute_survival_metrics(
     risk_train = model.predict(x_train)
     risk_test = model.predict(x_test)
 
-    # Garante orientação consistente do risco
-    if np.mean(risk_train[y_train_surv["event"]]) < np.mean(risk_train[~y_train_surv["event"]]):
-        risk_train = -risk_train
-        risk_test = -risk_test
+    # XGBoost survival:cox já retorna log-hazard
+    risk_train = np.asarray(risk_train, dtype=float)
+    risk_test = np.asarray(risk_test, dtype=float)
 
     cindex_train = float(
         concordance_index_censored(y_train_surv["event"], y_train_surv["time"], risk_train)[0]
@@ -604,10 +603,9 @@ def compute_survival_metrics(
     )
     uno_cindex_test = float(concordance_index_ipcw(y_train_surv, y_test_surv, risk_test)[0])
 
-    risk_train = np.asarray(risk_train, dtype=float)
 
-    # Centraliza o preditor linear
-    risk_train -= np.mean(risk_train)
+    risk_train = risk_train - np.mean(risk_train)
+    risk_test = risk_test - np.mean(risk_train)
 
     breslow = BreslowEstimator().fit(
         y_train_surv["event"],
@@ -615,8 +613,6 @@ def compute_survival_metrics(
         risk_train,
     )
 
-    risk_test = np.asarray(risk_test, dtype=float)
-    risk_test -= np.mean(risk_train)
 
     survival_functions_test = breslow.get_survival_function(risk_test)
     domain_min, domain_max = survival_functions_test[0].domain
@@ -663,8 +659,10 @@ def compute_survival_metrics(
         "eval_times": clipped_times,           # unica fonte de verdade para os tempos
         "survival_test": survival_prob_test,   # shape (n_test, len(clipped_times))
         "brier_by_time": brier_scores,         # len == len(clipped_times)
-        "risk_train": risk_train,
-        "risk_test": risk_test,
+        "risk_train_original": model.predict(x_train),
+        "risk_test_original": model.predict(x_test),
+        "risk_train_breslow": risk_train,
+        "risk_test_breslow": risk_test,
     }
 
 
@@ -849,7 +847,7 @@ def compute_km_risk_groups(
     # -----------------------------------------------------
     # Detecta automaticamente orientação do risco
     # -----------------------------------------------------
-    if np.mean(log_risk[event]) < np.mean(log_risk[~event]):
+    if concordance_index_censored(event,time,log_risk)[0] < 0.5:
         log_risk = -log_risk
 
     # -----------------------------------------------------
@@ -975,37 +973,53 @@ def compute_calibration_by_decil(
     n_decils: int = 10,
 ) -> pd.DataFrame:
     """Para um tempo de referencia eval_time, calcula E/O por decil de risco."""
-    order = np.argsort(log_risk)
+
+    # Maior risco primeiro
+    order = np.argsort(log_risk)[::-1]
+
     n = len(log_risk)
     rows = []
 
     for d in range(n_decils):
+
         idx_start = int(n * d / n_decils)
         idx_end = int(n * (d + 1) / n_decils)
+
         idx = order[idx_start:idx_end]
 
         expected_surv = float(np.mean(survival_at_t[idx]))
         expected_event_rate = 1.0 - expected_surv
 
-        t_dec, e_dec = time[idx], event[idx]
+        t_dec = time[idx]
+        e_dec = event[idx]
+
         km_t, km_s = km_curve(t_dec, e_dec)
-        obs_surv = float(np.interp(eval_time, km_t, km_s))
+
+        obs_surv = float(
+            np.interp(
+                eval_time,
+                km_t,
+                km_s
+            )
+        )
+
         obs_event_rate = 1.0 - obs_surv
 
         eo_ratio = obs_event_rate / max(expected_event_rate, 1e-8)
 
-        rows.append({
-            "decil": d + 1,
-            "n": len(idx),
-            "sobrev_esperada_modelo": round(expected_surv, 4),
-            "taxa_evento_esperada": round(expected_event_rate, 4),
-            "sobrev_observada_km": round(obs_surv, 4),
-            "taxa_evento_observada": round(obs_event_rate, 4),
-            "razao_E_O": round(eo_ratio, 4),
-        })
+        rows.append(
+            {
+                "decil": d + 1,
+                "n": len(idx),
+                "sobrev_esperada_modelo": round(expected_surv, 4),
+                "taxa_evento_esperada": round(expected_event_rate, 4),
+                "sobrev_observada_km": round(obs_surv, 4),
+                "taxa_evento_observada": round(obs_event_rate, 4),
+                "razao_E_O": round(eo_ratio, 4),
+            }
+        )
 
     return pd.DataFrame(rows)
-
 
 # ---------------------------------------------------------------------------
 # 4. D de Royston
@@ -1294,7 +1308,7 @@ def save_results(
         "  (IBS < 0.25 e considerado bom; IBS = 0.25 equivale ao modelo nulo)",
         "",
         f"[Calibracao por decil de risco — tempo de referencia: {calib_eval_time:.1f}]",
-        "(Decil 1 = menor risco, Decil 10 = maior risco)",
+        "(Decil 1 = maior risco, Decil 10 = menor risco)",
         "(Razao E/O: 1.0 = calibracao perfeita; > 1 = subestima evento; < 1 = superestima)",
         calib_df.to_string(index=False),
         "",
@@ -1456,7 +1470,7 @@ def main() -> None:
     )
 
     # Recupera os risk scores gerados internamente pelo compute_survival_metrics
-    risk_test = metrics.pop("risk_test")
+    risk_test = metrics.pop("risk_test_original")
 
     print("\nCalculando metricas adicionais...")
 
