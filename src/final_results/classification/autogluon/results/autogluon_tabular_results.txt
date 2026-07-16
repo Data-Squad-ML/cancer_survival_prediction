@@ -1,0 +1,107 @@
+======================================================================
+AUTOGLOUON TABULAR - RESULTADOS
+======================================================================
+Data/hora: 2026-07-15T17:33:29
+Coluna alvo: status_vital
+Presets: high_quality
+Num GPUs configurado: 1
+Amostras de treino: 58767
+Amostras de teste: 14692
+Total de features selecionadas: 76
+Melhor modelo (leaderboard): RandomForest_BAG_L1
+
+--- Metricas no teste ---
+ROC-AUC: 0.872203
+PR-AUC: 0.978236
+KS: 0.584816
+F1-score: 0.940569
+MCC: 0.360803
+Brier: 0.079822
+Log-Loss: 0.263900
+
+--- Metricas de evaluate() no teste ---
+accuracy: 0.891778
+balanced_accuracy: 0.615432
+f1: 0.940866
+mcc: 0.367161
+precision: 0.901697
+recall: 0.983593
+roc_auc: 0.872203
+
+--- Features usadas (anti-vazamento) ---
+idade
+tempo_ate_consulta
+tempo_ate_tratamento
+tipo_caso
+sexo
+historico_familiar_cancer
+mais_de_um_tumor_primario
+escolaridade
+t_tnm
+n_tnm
+m_tnm
+t_ptnm
+n_ptnm
+m_ptnm
+comportamento_histologico_tumor
+historico_tabagismo_info_ausente
+historico_alcoolismo_info_ausente
+tipo_histologico_tumor_te
+subcat_localizacao_primaria_te
+cat_localizacao_primaria_te
+ocupacao_principal_gap
+raca_cor_1
+raca_cor_2
+raca_cor_3
+raca_cor_4
+raca_cor_5
+uf_procedencia_regiao_Centro-Oeste
+uf_procedencia_regiao_Nordeste
+uf_procedencia_regiao_Norte
+uf_procedencia_regiao_Sudeste
+uf_procedencia_regiao_Sul
+uf_hospital_regiao_Centro-Oeste
+uf_hospital_regiao_Nordeste
+uf_hospital_regiao_Norte
+uf_hospital_regiao_Sudeste
+uf_hospital_regiao_Sul
+origem_encaminhamento_1
+origem_encaminhamento_2
+origem_encaminhamento_3
+origem_encaminhamento_8
+exames_relevantes_diagnostico_1
+exames_relevantes_diagnostico_2
+exames_relevantes_diagnostico_3
+exames_relevantes_diagnostico_4
+exames_relevantes_diagnostico_5
+exames_relevantes_diagnostico_8
+diagnostico_tratamento_anteriores_1
+diagnostico_tratamento_anteriores_2
+diagnostico_tratamento_anteriores_3
+diagnostico_tratamento_anteriores_4
+base_diagnostico_mais_importante_1
+base_diagnostico_mais_importante_2
+base_diagnostico_mais_importante_3
+base_diagnostico_mais_importante_4
+base_diagnostico_mais_importante_5
+base_diagnostico_mais_importante_6
+base_diagnostico_mais_importante_7
+base_diagnostico_microscopica_1
+base_diagnostico_microscopica_2
+base_diagnostico_microscopica_3
+primeiro_tratamento_hospital_1
+primeiro_tratamento_hospital_2
+primeiro_tratamento_hospital_3
+primeiro_tratamento_hospital_4
+primeiro_tratamento_hospital_5
+primeiro_tratamento_hospital_6
+primeiro_tratamento_hospital_7
+primeiro_tratamento_hospital_8
+historico_tabagismo_clinico_None
+historico_tabagismo_clinico_atual
+historico_tabagismo_clinico_ex
+historico_tabagismo_clinico_nunca
+historico_alcoolismo_clinico_None
+historico_alcoolismo_clinico_atual
+historico_alcoolismo_clinico_ex
+historico_alcoolismo_clinico_nunca
