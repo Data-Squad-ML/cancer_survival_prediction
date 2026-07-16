@@ -55,7 +55,7 @@ OHE_PREFIXES = [
     "origem_encaminhamento_", "exames_relevantes_diagnostico_",
     "diagnostico_tratamento_anteriores_", "base_diagnostico_mais_importante_",
     "base_diagnostico_microscopica_", "primeiro_tratamento_hospital_",
-    "razao_nao_tratamento_hospital_", "historico_tabagismo_clinico_",
+    "historico_tabagismo_clinico_",
     "historico_alcoolismo_clinico_",
 ]
 

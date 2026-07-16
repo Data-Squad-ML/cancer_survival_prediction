@@ -193,11 +193,11 @@ def _predict_proba_numpy(model: RandomForestClassifier, x_df: pd.DataFrame) -> n
 # ---------------------------------------------------------------------------
 def _param_grid():
     grid = {
-        "n_estimators":     [100, 200, 400],
-        "max_depth":        [10, 20, None],
-        "min_samples_split":[2, 5, 10],
-        "min_samples_leaf": [1, 2, 4],
-        "max_features":     ["sqrt", "log2"],
+        "n_estimators":     [400],
+        "max_depth":        [None],
+        "min_samples_split":[5],
+        "min_samples_leaf": [1],
+        "max_features":     ["log2"],
     }
     keys = list(grid.keys())
     for combo in product(*[grid[k] for k in keys]):

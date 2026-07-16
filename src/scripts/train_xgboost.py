@@ -67,7 +67,6 @@ OHE_PREFIXES = [
     "base_diagnostico_mais_importante_",
     "base_diagnostico_microscopica_",
     "primeiro_tratamento_hospital_",
-    "razao_nao_tratamento_hospital_",
     "historico_tabagismo_clinico_",
     "historico_alcoolismo_clinico_",
 ]
@@ -207,13 +206,13 @@ def run_training(
     )
 
     param_grid = {
-        "model__n_estimators": [200, 400],
-        "model__max_depth": [4, 6, 8],
-        "model__learning_rate": [0.03, 0.05, 0.1],
-        "model__subsample": [0.8, 1.0],
-        "model__colsample_bytree": [0.8, 1.0],
-        "model__min_child_weight": [1, 3],
-        "model__gamma": [0.0, 0.2],
+        "model__n_estimators": [400],
+        "model__max_depth": [6],
+        "model__learning_rate": [0.03],
+        "model__subsample": [0.8],
+        "model__colsample_bytree": [0.8],
+        "model__min_child_weight": [3],
+        "model__gamma": [0.0],
     }
 
     cv_strategy = KFold(n_splits=cv, shuffle=True, random_state=random_state)
